@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script type="text/javascript" src="jquery-3.3.1.min.js"></script>
+    <script type="text/javascript">
+      //$("body").scroll
+      var a = 0;
+      var length = 1;
+      var waitTime = 3000;
+      var speed = 2000;
+
+      /* Init */
+      function start() {
+        setting();
+        var t = setTimeout(run, waitTime);
+        console.log("start");
+      }
+
+      /* Setting */
+      function setting() {
+        $( "section#view" ).each(function( index ) {
+          $(this).css("left","100%");
+          $(this).css("z-index","1");
+        });
+        length = $('section#view').length;
+        var view1 = $('section#view').eq(a);
+        view1.css("left","0%");
+        view1.css("z-index","-1");
+        view1 = null;
+        view2 = null;
+        console.log("setting finish");
+      }
+
+      /* Run */
+      function run() {
+        if (length == 1) {
+          return;
+        }
+        window.requestAnimationFrame(move);
+      }
+
+      /* move */
+      function move() {
+        console.log("move");
+        a = a%(length);
+        var view1 = $('section#view').eq(a);
+        var view2 = $('section#view').eq((a+1)%length);
+        a++;
+        view2.animate({left: "0%"},speed,function(){
+          view1.css("left","100%");
+          view1.css("z-index","1");
+          view2.css("z-index","-1");
+          view1.clearQueue();
+          view2.clearQueue();
+          view1.finish();
+          view2.finish();
+          view1 = null;
+          view2 = null;
+          var t = setTimeout(run, waitTime);
+        });
+      }
+    </script>
+
+    <style media="screen">
+      body, html {
+        font-family: 'Noto Sans KR', sans-serif;
+        font-size: 100%;
+        padding: 0;
+        margin: 0;
+        height: 100%;
+        overflow: hidden;
+      }
+
+      #view {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        text-align: middle;
+      }
+
+
+      #bar {
+        top: 0;
+        position: fixed;
+        width: 100%;
+        text-align: center;
+        z-index: 99;
+        display: none;
+      }
+
+      iframe{
+        outline: none;
+        border: 0;
+        width: 100%;
+        height: 100%;
+      }
+    </style>
+    <title>home</title>
+  </head>
+  <body onload="start()">
+    <div id="bar">
+      top menu
+    </div>
+    <!--
+    <section id="view">
+      <iframe src="weather.view/index.html"></iframe>
+    </section>
+    <section id="view">
+      <iframe src="clock.view/index.html"></iframe>
+    </section>
+    <section id="view">
+      <iframe src="food.view/index.html"></iframe>
+    </section>
+    <section id="view">
+      <iframe src="menu.view/index.html"></iframe>
+    </section>
+    -->
+    <section id="view">
+      <iframe src="img.view/index.html"></iframe>
+    </section>
+  </body>
+</html>

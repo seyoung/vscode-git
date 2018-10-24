@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>menu view</title>
+    <style media="screen">
+      @import url(http://fonts.googleapis.com/earlyaccess/notosanskr.css);
+
+      * {
+        font-family: "Noto Sans KR";
+      }
+
+      html, body{
+        margin: 0;
+        padding: 0;
+        background-color: rgb(254, 255, 190);
+      }
+
+      div#menutable {
+        position:absolute;
+        top:50%;
+        left:50%;
+        transform: translate(-50%, -50%);
+        font-size: 3vw;
+        width: 80vw;
+      }
+
+      #menutable table {
+        width: 100%;
+        border-collapse: collapse;
+        font-weight: bold;
+      }
+
+      #menutable table tr:nth-child(2) td{
+        text-align: center;
+      }
+
+      #menutable table tr:first-child td{
+         width: 20vw;
+         height: 4em;
+         transform: rotate(90deg);
+        writing-mode: vertical-rl;
+      }
+      #menutable p {
+        text-align: center;
+        font-size: 6vw;
+        margin: 0px;
+        margin-bottom: 1em;
+        font-weight: bold;
+        border-bottom: 0.1em solid #000;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="menutable">
+      <p>맛있을 만두 하지</p>
+      <table>
+        <tr>
+          <td>군만두</td><td>찐만두</td><td>찰떡만두</td><td>김치만두</td>
+        </tr>
+        <tr>
+          <td>5.0</td><td>4.0</td><td>8.0</td><td>7.0</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

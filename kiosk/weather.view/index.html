@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<script type="text/javascript" src="../jquery-3.3.1.min.js"></script>
+		<script type="text/javascript">
+
+
+		function startTime() {
+			console.log("hello");
+			$.get("/weather.txt", function (data) {
+				var weather = $(data).find('data[seq="0"]');
+				console.log(weather.find("wfKor").text());
+				console.log(weather.find("temp").text() + "'C");
+				console.log(weather.find("reh").text() + "%");
+				var wtext = weather.find("wfKor").text();
+				var wtemp = weather.find("temp").text();
+				var whumi = weather.find("reh").text();
+				var local = $(data).find("category").text();
+				document.getElementById('weather').innerHTML = wtext + "<br>"
+						+ wtemp + "℃<br>" + whumi + "%";
+				document.getElementById('location').innerHTML = local;
+			});
+
+			var t = setTimeout(startTime, 10000);
+		}
+
+		</script>
+	</head>
+	<body onload="startTime()">
+
+		<style>
+		@import url(http://fonts.googleapis.com/earlyaccess/notosanskr.css);
+
+		* {
+			font-family: "Noto Sans KR";
+		}
+		body, html {
+				font-size: 100%;
+				padding: 0;
+				margin: 0;
+				height: 100%;
+				background-color: #EF6C00;
+		}
+		div#weather {
+			color: white;
+			position: fixed;
+			right: 0.5em;
+			bottom: 0.5em;
+			font-size: 7vw;
+			text-align: right;
+		}
+
+		div#location {
+			color: white;
+			position: fixed;
+			left: 0.5em;
+			top: 0.5em;
+			font-size: 4vw;
+			text-align: right;
+		}
+		</style>
+		<div id="weather"></div>
+		<div id="location"></div>
+	</body>
+</html>
