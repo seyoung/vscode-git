@@ -6,10 +6,12 @@ $(function(){
     // buttons1  1행
     $('#buttons1 button:nth-child(-n+3)')
         .on('click', function() {
+           /*
             $(this).stop(true).animate({
                 backgroundColor: '#ae5e9b',
                 color: '#fff'
             }, duration);
+            */
         })
         .on('mouseout', function(){
             $(this).stop(true).animate({
