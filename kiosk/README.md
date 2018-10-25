@@ -1,2 +1,1 @@
-# RPS_BOARD
-Raspberry Pi Signage Board
+# Coference Room kiosk Project
