@@ -9,12 +9,11 @@
 
 <script src="./js/vendor/jquery-3.3.1.min.js"></script>
 <script src="./js/vendor/jquery-ui-1.10.3.custom.min.js"></script>
-<script src="_dbo_cal_res_get.php"></script>
 <script src="./js/main.js"></script>
 </head>
-<body>
 
-<header class="page-header" role="banner">
+<body>
+ <header class="page-header" role="banner">
     <!-- <h1>Dreamtech Kiosk web</h1> -->
     <div id="bg-company-title">
         <img src="img/bgCompany.jpg" class="stretch" alt="" />
@@ -40,6 +39,31 @@
     </div><div id="Table1" style="display:inline-block">
         <div class="inner clearfix"></div>
     </div>
+</div>
+
+<p id="timezones"></p>
+<input type="button" id="execute" value="execute" />
+<script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+<script>
+    $('#execute').click(function(){
+        $.ajax({
+            url:'./time2.php',
+            dataType:'json',
+            success:function(data){
+                var str = '';
+                for(var name in data){
+                    str += '<li>'+data[name]+'</li>';
+                }
+                $('#timezones').html('<ul>'+str+'</ul>');
+            }
+        })
+    })
+</script>
+
+
+
+
+
 <footer class="page-footer" role="contentinfo">
     <small class="copyright">COPYRIGHT &copy; <a href="http://www.idreamtech.co.kr" target="_blank">Dreamtech co., ltd.</a></small>
 </footer>
