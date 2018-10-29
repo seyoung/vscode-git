@@ -1,20 +1,44 @@
 <?php
+echo $_POST["method"]();
+//getDatabases();
+/*************************************************************************
+NAME
 
-get_sql();
+DESCRIPTION
 
-function get_sql()
-{
-    $o = array();
-    $connectionTimeoutSeconds = 30;  // Default of 15 seconds is too short over the Internet, sometimes.
+RETURNS
 
-    $serverName = "192.168.1.200, 1433";
+*/
+function getDatabases(){
+    if(isset($_POST['server'])) {
+        $server = json_decode($_POST['server']);
+    }
+    if(isset($_POST['username'])) {
+        $username = json_decode($_POST['username']);
+    }
+    if(isset($_POST['password'])) {
+        $password = json_decode($_POST['password']);
+    }
+    /*
+    if(isset($_POST['portnumber'])) {
+        $portnumber = json_decode($_POST['portnumber']);
+    }
+    */
+    if(isset($_POST['dbname'])) {
+        $dbname = json_decode($_POST['dbname']);
+    }
+
+    $connectionTimeoutSeconds = 15;  // Default of 15 seconds is too short over the Internet, sometimes.
+    $serverName = $server;
     $connectionOptions = array(
-        "Database"=>"WO2011",
-        "UID"=>"dreamtech01",
-        "PWD"=>"dreamtech01",
+        "Database"=>$dbname,
+        "UID"=>$username,
+        "PWD"=>$password,
         "CharacterSet" => "UTF-8",
         "LoginTimeout" => $connectionTimeoutSeconds);
     $conn = null;
+
+    //debug_to_console($connectionOptions);
 
     //sqlsrv_configure('WarningsReturnAsErrors', true);
     //sqlsrv_configure('LogSubsystems', SQLSRV_LOG_SYSTEM_ALL);
@@ -30,10 +54,9 @@ function get_sql()
         die( print_r( sqlsrv_errors(), true));
     }
 
-
     $sql = "SELECT * FROM dbo.cal_res_sch";
     $params = array();
-    $options =  array(
+    $options = array(
         /*"Scrollable" => 'static'*/
     );
 
@@ -54,6 +77,33 @@ function get_sql()
     //echo "Field count result = $row_count\n";
 
     /*
+    $arr = array( // 1차원 배열을 3개 갖는 2차원 배열 선언
+        array(),
+        array(),
+        array()
+    );
+
+
+    $arr[0][0] = "apple"; // 배열 요소 입력
+    $arr[0][1] = "korea";
+    $arr[0][2] = 1000;
+
+
+    $arr[1][0] = "banana";
+    $arr[1][1] = "philippines";
+    $arr[1][2] = 2000;
+
+
+    $arr[2][0] = "orange";
+    $arr[2][1] = "us";
+    $arr[2][2] = 1500;
+
+
+    echo $arr[0][0].", ".$arr[0][1].", ".$arr[0][2]."<br>";
+    echo $arr[1][0].", ".$arr[1][1].", ".$arr[1][2]."<br>";
+    echo $arr[2][0].", ".$arr[2][1].", ".$arr[2][2]";
+    */
+    /*
     row0: int- schedule_seq
     row1: int- resource_seq
     row2: int- calendar_seq
@@ -70,9 +120,14 @@ function get_sql()
     row13: int- repeat_wd
     row14: date- repeat_end_date
     */
+    $databaseNames = array();
+    $databaseNames[] = array();
+    $databaseNames[] = array();
 
     while( $row = sqlsrv_fetch_array( $stmt) ) {
-
+        array_push($databaseNames[0], $row['actor']);
+        array_push($databaseNames[1], $row['actor']);
+        /*
         $sdate_string = date_format( $row['sdate'], 'jS, F Y' );
         $edate_string = date_format( $row['edate'], 'jS, F Y' );
         $repeat_end_date_string = date_format( $row['repeat_end_date'], 'jS, F Y' );
@@ -94,9 +149,17 @@ function get_sql()
         $row['repeat_wd'].", ".
         $repeat_end_date_string.",".
         "\n";
+        */
     }
 
     sqlsrv_free_stmt($stmt);
     sqlsrv_close( $conn);
+
+    $return = new stdClass;
+    $return->success = true;
+    $return->errorMessage = "";
+    $return->data['database_names'] = $databaseNames;
+    $json = json_encode($return);
+    echo $json;
 }
 ?>
