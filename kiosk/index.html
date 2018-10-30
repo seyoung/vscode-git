@@ -1,4 +1,11 @@
 <!DOCTYPE html>
+<!--  Prototype Dreamtech Kiosk, version 1.0.0.0
+ *  (c) 2018-2019 Seyoung Park.
+ *
+ *
+ *
+ -->
+
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
@@ -24,11 +31,10 @@
     Password: <input type="text" id="password" value="dreamtech01"><br>
     Port: <input type="text" id="portnumber" value="1433"><br>
     DB: <input type="text" id="dbname" value="WO2011"><br>
-    <input type="Submit" value="Log In" Class="button">
     <button type="button" onclick="loadDatabaseList()">show Database</button>
-    <select id="databases"></select>
-    <select id="databases1"></select>
-    <select id="databases2"></select>
+    <select id="databases" name="lang" onchange="changeLang_1_Select()"></select>
+    <select id="databases1" name="lang" onchange="changeLang_2_Select()"></select>
+    Resouce ID: <input type="text" id="resource_id" value="id"><br>
 
 </header>
 
