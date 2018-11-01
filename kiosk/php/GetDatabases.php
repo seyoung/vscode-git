@@ -5,249 +5,243 @@
  *
  *
  */
-
+//$object = new mssql_db;
+//$object->Connect_Databases();
 echo $_POST["method"]();
 
-/*************************************************************************
-NAME
-DESCRIPTION
-RETURNS
-*/
-function Connect_Databases_res_sch(){
-    $conn = null;
+//$row_count = sqlsrv_num_rows( $stmt );
+//echo "Row count result = $row_count\n";
 
-    if(isset($_POST['server'])) {
-        $server = json_decode($_POST['server']);
-    }
-    if(isset($_POST['username'])) {
-        $username = json_decode($_POST['username']);
-    }
-    if(isset($_POST['password'])) {
-        $password = json_decode($_POST['password']);
-    }
-    /*
-    if(isset($_POST['portnumber'])) {
-        $portnumber = json_decode($_POST['portnumber']);
-    }
+//$field_count = sqlsrv_num_fields( $stmt );
+//echo "Field count result = $row_count\n";
+
+//class mssql_db{
+//    public $conn;
+//    public $msg;
+//    public $name;
+
+    /*************************************************************************
+    NAME
+    DESCRIPTION
+    RETURNS
     */
-    if(isset($_POST['dbname'])) {
-        $dbname = json_decode($_POST['dbname']);
+    function Connect_Databases()
+    {
+        if(isset($_POST['server'])) {
+            $server = json_decode($_POST['server']);
+        }
+        if(isset($_POST['username'])) {
+            $username = json_decode($_POST['username']);
+        }
+        if(isset($_POST['password'])) {
+            $password = json_decode($_POST['password']);
+        }
+        if(isset($_POST['portnumber'])) {
+            $portnumber = json_decode($_POST['portnumber']);
+        }
+        if(isset($_POST['dbname'])) {
+            $dbname = json_decode($_POST['dbname']);
+        }
+
+        $connectionTimeoutSeconds = 15;  // Default of 15 seconds
+        $serverName = $server;
+        $connectionOptions = array(
+            "Database"=>$dbname,
+            "UID"=>$username,
+            "PWD"=>$password,
+            "CharacterSet" => "UTF-8",
+            "LoginTimeout" => $connectionTimeoutSeconds);
+
+        //debug_to_console($connectionOptions);
+        //sqlsrv_configure('WarningsReturnAsErrors', true);
+        //sqlsrv_configure('LogSubsystems', SQLSRV_LOG_SYSTEM_ALL);
+        //sqlsrv_configure('LogSeverity', SQLSRV_LOG_SEVERITY_ALL);
+
+        $conn = sqlsrv_connect( $serverName, $connectionOptions);
+        return $conn;
     }
-    /*
-    if(isset($_POST['adate'])) {
-        $portnumber = json_decode($_POST['adate']);
-    }
-    if(isset($_POST['edate'])) {
-        $portnumber = json_decode($_POST['edate']);
-    }
-    if(isset($_POST['res_seq'])) {
-        $portnumber = json_decode($_POST['res_seq']);
-    }
+
+    /*************************************************************************
+    NAME
+    DESCRIPTION
+    RETURNS
     */
-
-    $connectionTimeoutSeconds = 15;  // Default of 15 seconds is too short over the Internet, sometimes.
-    $serverName = $server;
-    $connectionOptions = array(
-        "Database"=>$dbname,
-        "UID"=>$username,
-        "PWD"=>$password,
-        "CharacterSet" => "UTF-8",
-        "LoginTimeout" => $connectionTimeoutSeconds);
-
-
-    //debug_to_console($connectionOptions);
-
-    //sqlsrv_configure('WarningsReturnAsErrors', true);
-    //sqlsrv_configure('LogSubsystems', SQLSRV_LOG_SYSTEM_ALL);
-    //sqlsrv_configure('LogSeverity', SQLSRV_LOG_SEVERITY_ALL);
-
-    //echo "connet to: $serverName\n";
-    $conn = sqlsrv_connect( $serverName, $connectionOptions);
-
-    if( $conn == true ) {
-       // echo "Connection established.\n";
-    }else{
-        //echo "Connection could not be established.\n";
-        die( print_r( sqlsrv_errors(), true));
+    function Disconnect_Databases()
+    {
+        sqlsrv_free_stmt($stmt);
+        sqlsrv_close( $conn);
     }
 
-    $sql = "SELECT * FROM dbo.cal_res_sch";
-    $params = array();
-    $options = array(
-        /*"Scrollable" => 'static'*/
-    );
+    /*************************************************************************
+    NAME
+    DESCRIPTION
+    RETURNS
+    */
+    function Get_DB_cal_res(){
+        $return = new stdClass;
 
-    $stmt = sqlsrv_query($conn, $sql, $params, $options);
-    if( $stmt === false ) {
-        if( ($errors = sqlsrv_errors() ) != null) {
-            foreach( $errors as $error ) {
-                echo "SQLSTATE: ".$error[ 'SQLSTATE']."\n";
-                echo "code: ".$error[ 'code']."\n";
-                echo "message: ".$error[ 'message']."\n";
+        // Connection DB
+        if(($conn = Connect_Databases()) == true ) {
+            $return->success = true;
+        }else{
+            $return->success = false;
+        }
+
+        if($conn == true) {
+            // primary key : schedule_seq
+            $sql = "SELECT * FROM dbo.cal_res";
+            $params = array();
+            $options = array(
+                //"Scrollable" => 'static'
+            );
+            $stmt = sqlsrv_query($conn, $sql, $params, $options);
+            if( $stmt === false ) {
+                $return->success = false;
+            }
+            else{
+                $databaseNames = [
+                    'schedule_seq' => [],
+                    'resource_seq' => [],
+                    'info' => [],
+                    'position' => []
+                ];
+
+                while( $row = sqlsrv_fetch_array( $stmt) ) {
+                    array_push($databaseNames['schedule_seq'], $row['schedule_seq']);
+                    array_push($databaseNames['resource_seq'], $row['resource_seq']);
+                    array_push($databaseNames['info'], $row['info']);
+                    array_push($databaseNames['position'], $row['position']);
+                }
+                $return->success = true;
             }
         }
-    }
-    $row_count = sqlsrv_num_rows( $stmt );
-    //echo "Row count result = $row_count\n";
-
-    $field_count = sqlsrv_num_fields( $stmt );
-    //echo "Field count result = $row_count\n";
-
-    $databaseNames = array();
-
-    while( $row = sqlsrv_fetch_array( $stmt) ) {
-        array_push($databaseNames, $row['actor']);
-        /*
-        $sdate_string = date_format( $row['sdate'], 'jS, F Y' );
-        $edate_string = date_format( $row['edate'], 'jS, F Y' );
-        $repeat_end_date_string = date_format( $row['repeat_end_date'], 'jS, F Y' );
-
-        echo
-        $row['schedule_seq'].", ".
-        $row['resource_seq'].", ".
-        $row['calendar_seq'].", ".
-        $row['user_seq'].", ".
-        $row['actor'].", ".
-        $sdate_string.",".
-        $edate_string.",".
-        $row['title'].", ".
-        $row['body'].", ".
-        $row['repeat_type'].", ".
-        $row['repeat_day'].", ".
-        $row['repeat_week'].", ".
-        $row['repeat_month'].", ".
-        $row['repeat_wd'].", ".
-        $repeat_end_date_string.",".
-        "\n";
-        */
+        $return->errorMessage = sqlsrv_errors();
+        $return->data['database'] = $databaseNames;
+        $json = json_encode($return);
+        Disconnect_Databases();
+        echo $json;
     }
 
-    sqlsrv_free_stmt($stmt);
-    sqlsrv_close( $conn);
-
-    $return = new stdClass;
-    $return->success = true;
-    $return->errorMessage = "";
-    $return->data['database_names'] = $databaseNames;
-    $json = json_encode($return);
-    echo $json;
-}
-
-/*************************************************************************
-NAME
-DESCRIPTION
-RETURNS
-*/
-function Disconnect_Databases()
-{
-    sqlsrv_free_stmt($stmt);
-    sqlsrv_close( $conn);
-}
-
-/*************************************************************************
-NAME
-DESCRIPTION
-RETURNS
-*/
-function Connect_Databases_res(){
-    $conn = null;
-    $return = new stdClass;
-
-    if(isset($_POST['server'])) {
-        $server = json_decode($_POST['server']);
-    }
-    if(isset($_POST['username'])) {
-        $username = json_decode($_POST['username']);
-    }
-    if(isset($_POST['password'])) {
-        $password = json_decode($_POST['password']);
-    }
-    /*
-    if(isset($_POST['portnumber'])) {
-        $portnumber = json_decode($_POST['portnumber']);
-    }
+    /*************************************************************************
+    NAME
+    DESCRIPTION
+    RETURNS
     */
-    if(isset($_POST['dbname'])) {
-        $dbname = json_decode($_POST['dbname']);
-    }
-    /*
-    if(isset($_POST['adate'])) {
-        $portnumber = json_decode($_POST['adate']);
-    }
-    if(isset($_POST['edate'])) {
-        $portnumber = json_decode($_POST['edate']);
-    }
-    if(isset($_POST['res_seq'])) {
-        $portnumber = json_decode($_POST['res_seq']);
-    }
-    */
+    function Get_DB_cal_res_sch(){
+        $return = new stdClass;
 
-    $connectionTimeoutSeconds = 15;  // Default of 15 seconds is too short over the Internet, sometimes.
-    $serverName = $server;
-    $connectionOptions = array(
-        "Database"=>$dbname,
-        "UID"=>$username,
-        "PWD"=>$password,
-        "CharacterSet" => "UTF-8",
-        "LoginTimeout" => $connectionTimeoutSeconds);
+        // Connection DB
+        if(($conn = Connect_Databases()) == true ) {
+            $return->success = true;
+        }else{
+            $return->success = false;
+        }
 
+        if(isset($_POST['sdate'])) {
+            $sdate = json_decode($_POST['sdate']);
+        }
+        if(isset($_POST['edate'])) {
+            $edate = json_decode($_POST['edate']);
+        }
+        if(isset($_POST['res_seq'])) {
+            $res_seq = json_decode($_POST['res_seq']);
+        }
 
-    //debug_to_console($connectionOptions);
+        if($conn == true) {
+            $sql = "SELECT * FROM dbo.cal_res_sch WHERE resource_seq LIKE '$res_seq' and sdate BETWEEN '$sdate' and '$edate'";
+            $params = array();
+            $options = array(
+                /*"Scrollable" => 'static'*/
+            );
 
-    //sqlsrv_configure('WarningsReturnAsErrors', true);
-    //sqlsrv_configure('LogSubsystems', SQLSRV_LOG_SYSTEM_ALL);
-    //sqlsrv_configure('LogSeverity', SQLSRV_LOG_SEVERITY_ALL);
+            $stmt = sqlsrv_query($conn, $sql, $params, $options);
+            if( $stmt === false ) {
+                $return->success = false;
+            }
+            else{
+                $databaseNames = [
+                    'resource_seq' => [],
+                    'actor' => [],
+                    'sdate' => [],
+                    'edate' => [],
+                    'body' => []
+                ];
 
-    //echo "connet to: $serverName\n";
-    $conn = sqlsrv_connect( $serverName, $connectionOptions);
-
-    if( $conn == true ) {
-       // echo "Connection established.\n";
-    }else{
-        //echo "Connection could not be established.\n";
-        die( print_r( sqlsrv_errors(), true));
-    }
-
-    $sql = "SELECT * FROM dbo.cal_res";
-    $params = array();
-    $options = array(
-        /*"Scrollable" => 'static'*/
-    );
-
-    $stmt = sqlsrv_query($conn, $sql, $params, $options);
-    if( $stmt === false ) {
-        if( ($errors = sqlsrv_errors() ) != null) {
-            foreach( $errors as $error ) {
-                //echo "SQLSTATE: ".$error[ 'SQLSTATE']."\n";
-                //echo "code: ".$error[ 'code']."\n";
-                //echo "message: ".$error[ 'message']."\n";
+                while( $row = sqlsrv_fetch_array( $stmt) ) {
+                    array_push($databaseNames['resource_seq'], $row['resource_seq']);
+                    array_push($databaseNames['actor'], $row['actor']);
+                    array_push($databaseNames['sdate'], $row['sdate']);
+                    array_push($databaseNames['edate'], $row['edate']);
+                    array_push($databaseNames['body'], $row['body']);
+                    //$sdate_string = date_format( $row['sdate'], 'jS, F Y' );
+                    //$edate_string = date_format( $row['edate'], 'jS, F Y' );
+                    //$repeat_end_date_string = date_format( $row['repeat_end_date'], 'jS, F Y' );
+                }
+                $return->success = true;
             }
         }
+        $return->errorMessage = sqlsrv_errors();
+        $return->data['database'] = $databaseNames;
+        $json = json_encode($return);
+        Disconnect_Databases();
+        echo $json;
     }
-    //$row_count = sqlsrv_num_rows( $stmt );
-    //echo "Row count result = $row_count\n";
 
-    //$field_count = sqlsrv_num_fields( $stmt );
-    //echo "Field count result = $row_count\n";
+    /*************************************************************************
+    NAME
+    DESCRIPTION
+    RETURNS
+    */
+    function Get_DB_cal_res_view(){
+        $return = new stdClass;
 
-    $databaseNames = [
-        'resource_seq' => [],
-        'info' => [],
-        'position' => []
-    ];
+        // Connection DB
+        if(($conn = Connect_Databases()) == true ) {
+            $return->success = true;
+        }else{
+            $return->success = false;
+        }
 
-    while( $row = sqlsrv_fetch_array( $stmt) ) {
-        array_push($databaseNames['resource_seq'], $row[0]);
-        array_push($databaseNames['info'], $row[1]);
-        array_push($databaseNames['position'], $row[2]);
+        if(isset($_POST['sdate'])) {
+            $sdate = json_decode($_POST['sdate']);
+        }
+        if(isset($_POST['edate'])) {
+            $edate = json_decode($_POST['edate']);
+        }
+
+        if($conn == true) {
+            // primary key : view_start_date BETWEEN '2018-10-31 00:30:00.000' and '2018-10-31 23:30:00' ORDER BY view_start_date asc
+            $sql = "SELECT * FROM dbo.cal_res_view WHERE view_start_date BETWEEN '$sdate' and '$edate' ORDER BY view_start_date asc";
+            $params = array();
+            $options = array(
+                //"Scrollable" => 'static'
+            );
+            $stmt = sqlsrv_query($conn, $sql, $params, $options);
+            if( $stmt === false ) {
+                $return->success = false;
+            }
+            else{
+                $databaseNames = [
+                    'resource_view_seq' => [],
+                    'schedule_seq' => [],
+                    'view_start_date' => [],
+                    'view_end_date' => []
+                ];
+
+                while( $row = sqlsrv_fetch_array( $stmt) ) {
+                    array_push($databaseNames['resource_view_seq'], $row['resource_view_seq']);
+                    array_push($databaseNames['schedule_seq'], $row['schedule_seq']);
+                    array_push($databaseNames['view_start_date'], $row['view_start_date']);
+                    array_push($databaseNames['view_end_date'], $row['view_end_date']);
+                }
+                $return->success = true;
+            }
+        }
+        $return->errorMessage = sqlsrv_errors();
+        $return->data['database'] = $databaseNames;
+        $json = json_encode($return);
+        Disconnect_Databases();
+        echo $json;
     }
-    sqlsrv_free_stmt($stmt);
-    sqlsrv_close( $conn);
-
-    $return->success = true;
-    $return->errorMessage = "";
-    $return->data['database_names'] = $databaseNames;
-    $json = json_encode($return);
-    echo $json;
-}
+//}
 ?>
