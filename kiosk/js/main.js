@@ -59,11 +59,11 @@ NAME
 DESCRIPTION
 RETURNS
 */
-function doAjax(method, func, sdate, edate, res_seq) {
+function doAjax(method, func, sdate, edate, res_seq, schedule_seq) {
     console.log('>doAjax: '+method);
 
     var server, username, password, portnumber, dbname;
-    var jsdate, jedate, jres_seq;
+    var jsdate, jedate, jres_seq, jschedule_seq;
     server = JSON.stringify($('#server').val());
     username = JSON.stringify($('#username').val());
     password = JSON.stringify($('#password').val());
@@ -72,11 +72,12 @@ function doAjax(method, func, sdate, edate, res_seq) {
     jsdate = JSON.stringify(sdate);
     jedate = JSON.stringify(edate);
     jres_seq = JSON.stringify(res_seq);
+    jschedule_seq = JSON.stringify(schedule_seq);
 
     console.log(server.concat("/", username, "/", password, "/", portnumber, "/", dbname));
 
     ajax = theAjax(method, 'http://localhost/vscode-git/kiosk/php/GetDatabases.php',
-                   server, username, password, portnumber, dbname ,jsdate, jedate, jres_seq);
+                   server, username, password, portnumber, dbname ,jsdate, jedate, jres_seq, jschedule_seq);
     ajax.done(func);
     ajax.fail(function () { alert("Failure"); });
 }
@@ -86,7 +87,7 @@ NAME
 DESCRIPTION
 RETURNS
 */
-function theAjax(method, url, server, username, password, portnum, dbname, sdate, edate, res_seq) {
+function theAjax(method, url, server, username, password, portnum, dbname, sdate, edate, res_seq, schedule_seq) {
     console.log('>theAjax');
     return $.ajax({
         type: 'POST',
@@ -99,7 +100,8 @@ function theAjax(method, url, server, username, password, portnum, dbname, sdate
             dbname: dbname,
             sdate: sdate,
             edate: edate,
-            res_seq: res_seq
+            res_seq: res_seq,
+            schedule_seq: schedule_seq
         }
     });
 }
@@ -112,6 +114,7 @@ RETURNS
 function changeLang_1_Select(){
     console.log(">database changeLangSelect");
     $("#databases1 option").remove();
+    text_clear();
 
     for(var i = 0; i < response.data['database']['position'].length; i++) {
         if($("#databases option:selected").val() == response.data['database']['position'][i]){
@@ -124,9 +127,10 @@ function changeLang_1_Select(){
            resource_id = response.data['database']['resource_seq'][i];
         }
     }
-    //'2018-10-31 01:00' and '2018-10-31 23:00'
-    doAjax("Get_DB_cal_res_sch", ret_Get_DB_cal_res_sch, '2018-10-31 01:00', '2018-10-31 23:00', resource_id);
-    //doAjax("Get_DB_cal_res_sch", ret_Get_DB_cal_res_sch, today_time(), today_time(), resource_id);
+    //doAjax("Get_DB_cal_res_view", ret_Get_DB_cal_res_view, today_time(fromtime.current_day_time_start), today_time(fromtime.current_day_time_end));
+
+    // get meeting room schedule list of database
+    doAjax("Get_DB_cal_res_view", ret_Get_DB_cal_res_view, '2018-10-31 00:30:00.000', '2018-10-31 23:30:00.000');
 }
 
 /*************************************************************************
@@ -136,6 +140,7 @@ RETURNS
 */
 function changeLang_2_Select(){
     console.log(">database1 changeLangSelect");
+    text_clear();
 
     for(var i = 0; i < response.data['database']['position'].length; i++) {
         if($("#databases option:selected").val() == response.data['database']['position'][i] &&
@@ -144,9 +149,30 @@ function changeLang_2_Select(){
            resource_id = response.data['database']['resource_seq'][i];
         }
     }
-    //'2018-10-31 01:00' and '2018-10-31 23:00'
-    doAjax("Get_DB_cal_res_sch", ret_Get_DB_cal_res_sch, '2018-10-31 01:00', '2018-10-31 23:00', resource_id);
-    //doAjax("Get_DB_cal_res_sch", ret_Get_DB_cal_res_sch, today_time(), today_time(), resource_id);
+    //doAjax("Get_DB_cal_res_view", ret_Get_DB_cal_res_view, today_time(fromtime.current_day_time_start), today_time(fromtime.current_day_time_end));
+
+    // get meeting room schedule list of database
+    doAjax("Get_DB_cal_res_view", ret_Get_DB_cal_res_view, '2018-10-31 00:30:00.000', '2018-10-31 23:30:00.000');
+}
+
+/*************************************************************************
+NAME
+DESCRIPTION
+RETURNS
+*/
+function text_init()
+{
+    $('#total_text').prop('readonly', true);
+}
+
+/*************************************************************************
+NAME
+DESCRIPTION
+RETURNS
+*/
+function text_clear()
+{
+    $("#total_text").empty();
 }
 
 /*************************************************************************
@@ -198,9 +224,11 @@ function ret_Get_DB_cal_res(response_in) {
            resource_id = response.data['database']['resource_seq'][i];
         }
     }
-    //'2018-10-31 01:00' and '2018-10-31 23:00'
-    doAjax("Get_DB_cal_res_sch", ret_Get_DB_cal_res_sch, '2018-10-31 01:00', '2018-10-31 23:00', resource_id);
-    //doAjax("Get_DB_cal_res_sch", ret_Get_DB_cal_res_sch, today_time(), today_time(), resource_id);
+
+    //doAjax("Get_DB_cal_res_view", ret_Get_DB_cal_res_view, today_time(fromtime.current_day_time_start), today_time(fromtime.current_day_time_end));
+
+    // get meeting room schedule list of database
+    doAjax("Get_DB_cal_res_view", ret_Get_DB_cal_res_view, '2018-10-31 00:30:00.000', '2018-10-31 23:30:00.000');
 }
 
 /*************************************************************************
@@ -213,17 +241,18 @@ function ret_Get_DB_cal_res_sch(response_in) {
     response2 = JSON.parse(response_in);
     console.log(response2);
 
-    $("#total_text").empty();
-    $('#total_text').prop('readonly', true);
+    //$("#total_text").empty();
+    //$('#total_text').prop('readonly', true);
 
     for(var i = 0; i < response2.data['database']['resource_seq'].length; i++)
     {
-        console.log(i);
-        var text_str = 'resource_seq: '+response2.data['database']['resource_seq'][i]+','+
-                       'actor: '+response2.data['database']['actor'][i]+','+
-                       'sdate: '+response2.data['database']['sdate'][i]+','+
-                       'edate: '+response2.data['database']['edate'][i]+','+
-                       'body: '+response2.data['database']['body'][i]+'\n';
+        //console.log(i);
+        var text_str = '1: '+response2.data['database']['schedule_seq'][i]+','+
+                       '2: '+response2.data['database']['resource_seq'][i]+','+
+                       '3: '+response2.data['database']['actor'][i]+','+
+                       '4: '+response2.data['database']['sdate'][i].date+','+
+                       '5: '+response2.data['database']['edate'][i].date+','+
+                       '6: '+response2.data['database']['body'][i]+'\n';
         text_add(text_str);
     };
 }
@@ -237,6 +266,22 @@ function ret_Get_DB_cal_res_view(response_in) {
     console.log('>ret_Get_DB_cal_res_view');
     response3 = JSON.parse(response_in);
     console.log(response3);
+
+    for(var i = 0; i < response3.data['database']['schedule_seq'].length; i++)
+    {
+        var text_str = '1: '+response3.data['database']['resource_view_seq'][i]+','+
+                       '2: '+response3.data['database']['schedule_seq'][i]+','+
+                       '3: '+response3.data['database']['view_start_date'][i].date+','+
+                       '4: '+response3.data['database']['view_end_date'][i].date;
+        console.log(text_str);
+        //text_add(text_str);
+
+        doAjax("Get_DB_cal_res_sch", ret_Get_DB_cal_res_sch, null, null, resource_id, response3.data['database']['schedule_seq'][i]);
+    };
+
+    //doAjax("Get_DB_cal_res_sch", ret_Get_DB_cal_res_sch, null, null, resource_id);
+    //doAjax("Get_DB_cal_res_sch", ret_Get_DB_cal_res_sch, today_time(), today_time(), resource_id);
+
 }
 
 /*************************************************************************
@@ -251,6 +296,9 @@ $(function () {
     today_time(fromtime.current_day_time);
     today_time(fromtime.current_day_time_start);
     today_time(fromtime.current_day_time_end);
+
+    // ui_init
+    text_init();
 
     // get meeting room list of database
     doAjax("Get_DB_cal_res", ret_Get_DB_cal_res);

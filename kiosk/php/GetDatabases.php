@@ -100,14 +100,12 @@ echo $_POST["method"]();
             }
             else{
                 $databaseNames = [
-                    'schedule_seq' => [],
                     'resource_seq' => [],
                     'info' => [],
                     'position' => []
                 ];
 
                 while( $row = sqlsrv_fetch_array( $stmt) ) {
-                    array_push($databaseNames['schedule_seq'], $row['schedule_seq']);
                     array_push($databaseNames['resource_seq'], $row['resource_seq']);
                     array_push($databaseNames['info'], $row['info']);
                     array_push($databaseNames['position'], $row['position']);
@@ -146,9 +144,12 @@ echo $_POST["method"]();
         if(isset($_POST['res_seq'])) {
             $res_seq = json_decode($_POST['res_seq']);
         }
+        if(isset($_POST['schedule_seq'])) {
+            $schedule_seq = json_decode($_POST['schedule_seq']);
+        }
 
         if($conn == true) {
-            $sql = "SELECT * FROM dbo.cal_res_sch WHERE resource_seq LIKE '$res_seq' and sdate BETWEEN '$sdate' and '$edate'";
+            $sql = "SELECT * FROM dbo.cal_res_sch WHERE resource_seq = $res_seq and schedule_seq = $schedule_seq";
             $params = array();
             $options = array(
                 /*"Scrollable" => 'static'*/
@@ -160,6 +161,7 @@ echo $_POST["method"]();
             }
             else{
                 $databaseNames = [
+                    'schedule_seq' => [],
                     'resource_seq' => [],
                     'actor' => [],
                     'sdate' => [],
@@ -168,6 +170,7 @@ echo $_POST["method"]();
                 ];
 
                 while( $row = sqlsrv_fetch_array( $stmt) ) {
+                    array_push($databaseNames['schedule_seq'], $row['schedule_seq']);
                     array_push($databaseNames['resource_seq'], $row['resource_seq']);
                     array_push($databaseNames['actor'], $row['actor']);
                     array_push($databaseNames['sdate'], $row['sdate']);

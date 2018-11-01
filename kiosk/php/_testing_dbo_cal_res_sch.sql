@@ -1,6 +1,8 @@
 select *
 from dbo.cal_res_sch
-where resource_seq LIKE '1' and sdate BETWEEN '2018-10-31 01:00' and '2018-10-31 23:00'
+--where resource_seq LIKE '1' and sdate BETWEEN '2018-10-31 01:00' and '2018-10-31 23:00'
+--where resource_seq = 1 and schedule_seq = 7122
+
 --where resource_seq LIKE '1'
 --and sdate BETWEEN '2018-10-31 01:00' and '2018-10-31 23:00'
 
