@@ -5,61 +5,146 @@
  *
  *
  -->
-
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <title>Dreamtech Kiosk web</title>
+
 <link rel="stylesheet" href="./css/normalize.css">
 <link rel="stylesheet" href="./css/main.css">
-<script src="./js/vendor/jquery-3.3.1.min.js"></script>
-<script src="./js/vendor/jquery-ui-1.10.3.custom.min.js"></script>
-<script src="js/main.js"></script>
+<script type="text/javascript" src="./js/vendor/jquery-3.3.1.min.js"></script>
+<script type="text/javascript" src="./js/vendor/jquery-ui-1.10.3.custom.min.js"></script>
+<!--
+    http://aamirafridi.com/jquery/jquery-marquee-plugin
+-->
+<script type="text/javascript" src="./js/vendor/jquery.marquee.min.js"></script>
+<!--
+    https://datatables.net/manual/styling/theme-creator
+    https://www.webcodegeeks.com/javascript/jquery/jquery-datatable-example/
+-->
+<!--
+    Using the jquery dataTables CSS CDN
+-->
+<link rel="stylesheet" type="text/css" href="./css/jquery.dataTables.css">
+<!--
+    Using the jquery dataTables API CDN
+-->
+<script type="text/javascript" charset="utf8" src="./js/vendor/jquery.dataTables.js"></script>
 
+<!--
+    Using the jquery Simple custom dialog
+    https://www.jqueryscript.net/other/Simple-Custom-Dialog-Popup-Plugin-With-jQuery.html
+-->
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link type="text/css" rel="Stylesheet" href="css/jquery.dialog.css" />
+<link type="text/css" rel="Stylesheet" href="css/home_common_all.css" />
+<script type="text/javascript" src="./js/vendor/jquery.dialog.js"></script>
+
+<!--
+    Main Javascript
+-->
+<script src="js/main.js"></script>
 </head>
 <body>
 
- <header class="page-header" role="banner">
-    <!-- <h1>Dreamtech Kiosk web</h1> -->
-    <div id="bg-company-title">
-        <img src="img/bgCompany.jpg" class="stretch" alt="" />
+<header class="page-header" role="banner">
+    <div class="image-wrapper">
+            <img src="./img/bgCompany.jpg" alt="" width="1730" height="200">
     </div>
-
-    Server: <input type="text" id="server" value="192.168.1.200"><br>
-    Username: <input type="text" id="username" value="dreamtech01"><br>
-    Password: <input type="text" id="password" value="dreamtech01"><br>
-    Port: <input type="text" id="portnumber" value="1433"><br>
-    DB: <input type="text" id="dbname" value="WO2011"><br>
-    <button type="button" onclick="loadDatabaseList()">show Database</button>
-    <select id="databases" name="lang" onchange="changeLang_1_Select()"></select>
-    <select id="databases1" name="lang" onchange="changeLang_2_Select()"></select>
-    <textarea name="" id="total_text" cols="150" rows="30"></textarea>
-
 </header>
+<section class="work-section" id="work">
+        <header class="section-header clearfix">
+            <div class="inner">
+                <span class="custom-dropdown small">
+                        <select id="databases" name="lang" onchange="changeLang_1_Select()"></select>
+                </span>
+                <span class="custom-dropdown small">
+                        <select id="databases1" name="lang" onchange="changeLang_2_Select()"></select>
+                </span>
+                <ul class="tabs-nav">
+                    <li><a href="#work01">회의실 예약 현황</a></li>
+                    <li><a href="#work02">다른 회의실 현황</a></li>
+                    <li><a href="#work03">회의실 이용 안내</a></li>
+                    <h3 id="clock"></h3>
+                </ul>
+            </div>
+            <div>
+            </div>
+        </header>
 
-<div class="page-main" role="main">
-    <aside>
-        <ul>
-            <li><a href="#"><img src="img/01_aside.png"></a></li>
-            <li><a href="#"><img src="img/02_aside.png"></a></li>
-            <li><a href="#"><img src="img/03_aside.png"></a></li>
-        </ul>
-        <button><img src="img/btn_open.png"></button>
-    </aside>
-
-    <div id="buttons1" style="display:inline-block">
-        <div class="inner clearfix">
-            <button>회의실 예약 현황</button>
-            <button>다른 회의실 현황</button>
-            <button>회의실 이용 안내</button>
+        <div class="section-body">
+            <section class="tabs-panel" id="work01">
+                <div class="image-wrapper">
+                    <!--<img src="./img/work-1.jpg" alt="" width="1600" height="400">-->
+                </div>
+                <div class="content">
+                    <table id="wgc_table" class="display">
+                            <thead>
+                                <tr>
+                                    <th>예약 시간</th>
+                                    <th>회의 제목</th>
+                                    <th>주관자</th>
+                                    <th>진행 상황</th>
+                                </tr>
+                            </thead>
+                    </table>
+                </div>
+            </section>
+            <section class="tabs-panel" id="work02">
+                <div class="image-wrapper">
+                    <!--<img src="./img/work-2.jpg" alt="" width="1600" height="400">-->
+                </div>
+                <div class="content">
+                    <div class="inner">
+                        <!--<textarea name="" id="total_text" cols="150" rows="15"></textarea>-->
+                        <textarea name="" id="total_text" cols="221" rows="24"></textarea>
+                    </div>
+                </div>
+            </section>
+            <section class="tabs-panel" id="work03">
+                <div class="image-wrapper">
+                    <!--<img src="./img/work-3.jpg" alt="" width="1600" height="400">-->
+                </div>
+                <div class="content">
+                    <div class="inner">
+                        <!--<textarea name="" id="total_text" cols="150" rows="15"></textarea>-->
+                        <textarea name="" id="total_text1" cols="221" rows="24"></textarea>
+                    </div>
+                </div>
+            </section>
         </div>
-    </div><div id="Table1" style="display:inline-block">
-        <div class="inner clearfix"></div>
+    </section>
+    <!--
+    Server: <input type="text" id="server" value="192.168.1.200">
+    Username: <input type="text" id="username" value="dreamtech01">
+    Password: <input type="text" id="password" value="dreamtech01">
+    Port: <input type="text" id="portnumber" value="1433">
+    DB: <input type="text" id="dbname" value="WO2011"><br>
+    -->
+    <input type="hidden" id="server" value="192.168.1.200">
+    <input type="hidden" id="username" value="dreamtech01">
+    <input type="hidden" id="password" value="dreamtech01">
+    <input type="hidden" id="portnumber" value="1433">
+    <input type="hidden" id="dbname" value="WO2011">
+    <footer class="page-footer" role="contentinfo">
+    <!--
+    <div class="inner">
+            <textarea name="" id="total_text" cols="150" rows="15"></textarea>
     </div>
-</div>
-<footer class="page-footer" role="contentinfo">
+    -->
+    <div class="marquee" >
+        <span style="color:black;">회의실 이용 시 청결 상태를 유지하여 주시기 바랍니다.</span>
+        <span style="color:black;">-------------------------------</span>
+        <span style="color:black;">회의실의 시설물 이용 시 사용법을 숙지하신 후 이용 하시기 바랍니다.</span>
+        <span style="color:black;">-------------------------------</span>
+        <span style="color:rgb(0, 42, 158);">담당: 컨버전스사업부 함준환 사원 031-620-1575</span>
+        <span style="color:black;">-------------------------------</span>
+        <span style="color:rgb(0, 42, 158);">A/S 및 설치: 컨버전스사업부 구재영 책임 031-620-1573</span>
+        <span style="color:black;">-------------------------------</span>
+    </div>
+    <input type="button" value="alert" id="alertXX" />
     <small class="copyright">COPYRIGHT &copy; <a href="http://www.idreamtech.co.kr" target="_blank">Dreamtech co., ltd.</a></small>
-</footer>
+    </footer>
 </body>
 </html>
