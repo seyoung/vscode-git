@@ -88,11 +88,11 @@ function today_time(type) {
     }
     // 2018-10-31 00:30:00.000
     else if (type == fromtime.current_day_time_start) {
-        today = yyyy + '-' + mm + '-' + dd + ' ' + '00' + ':' + '30' + ':' + '00';
+        today = yyyy + '-' + mm + '-' + dd + ' ' + '00' + ':' + '00' + ':' + '00';
     }
     // 2018-10-31 23:30:00.000
     else if (type == fromtime.current_day_time_end) {
-        today = yyyy + '-' + mm + '-' + dd + ' ' + '23' + ':' + '30' + ':' + '00';
+        today = yyyy + '-' + mm + '-' + dd + ' ' + '23' + ':' + '59' + ':' + '00';
     }
     // 23:30:00
     else if(type == fromtime.current_time) {
@@ -251,9 +251,9 @@ function text_display() {
                 console.log(now);
                 console.log(sdate);
                 console.log(edate);
-                if(sdate <= now && now <= edate){
+                if(sdate <= now && now < edate){
                     text_array[text_cnt][3] = "진행중";
-                }else if(now > edate){
+                }else if(now >= edate){
                     text_array[text_cnt][3] = "완료";
                 }
                 else{
@@ -285,6 +285,12 @@ function text_display() {
             table.$('td', i).css('backgroundColor', 'blue');
             table.$('td', i).css('color', 'white');
             //table.$('tr:odd').css('backgroundColor', 'blue');
+        }
+        else{
+            table.$('td', i).css('backgroundColor', 'white');
+            table.$('td', i).css('color', 'black');
+            //table.$('tr:odd').css('backgroundColor', 'blue');
+
         }
     }
 }
@@ -595,11 +601,12 @@ $(function () {
         .marquee({
             duration: 10000
         });
-
+        /*
         $('#alertXX').bind('click', function () {
             alertX("회의실 시작 10분전", "08:30 ~ 15:30 <br> 품질보증팀 조우규 주임 <br> 품질보증팀 계측기 관리방안 회의", function () {
                 //$.dialog.alert("Alert", "Closed");
             });
         });
+        */
     });
 });
