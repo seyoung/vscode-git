@@ -30,7 +30,7 @@ ibus engine hangul
 #auto append crontab
 crontab -u pi -l > mycron
 echo "@reboot /home/pi/run.sh &" >> mycron
-echo "* * * * * wget -O /var/www/html/weather.txt http://www.kma.go.kr/wid/queryDFSRSS.jsp?zone=4420035000" >> mycron
+#echo "* * * * * wget -O /var/www/html/weather.txt http://www.kma.go.kr/wid/queryDFSRSS.jsp?zone=4420035000" >> mycron
 crontab -u pi mycron
 rm mycron
 
