@@ -11,15 +11,15 @@ echo "finish install package"
 
 apt-get remove xscreensaver -y
 
-wget https://github.com/seyoung/vscode-git/tree/master/installer/update.sh
+wget https://raw.githubusercontent.com/seyoung/vscode-git/master/installer/update.sh
 chmod +x update.sh
 
 ./update.sh
 
-wget https://github.com/seyoung/vscode-git/tree/master/installer/run.sh
+wget https://raw.githubusercontent.com/seyoung/vscode-git/master/installer/run.sh
 chmod +x run.sh
 
-wget https://github.com/seyoung/vscode-git/tree/master/installer/default
+wget https://raw.githubusercontent.com/seyoung/vscode-git/master/installer/default
 mv default /etc/nginx/sites-available/default
 #nginx setting file download
 
