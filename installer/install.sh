@@ -4,7 +4,7 @@ cd /home/pi/
 echo "start install"
 
 #LIST="xinit x11-xserver-utils nginx php5-fpm php-apc unclutter gnome-schedule ttf-unfonts-core ibus ibus-hangul"
-LIST="xscreensaver xinit x11-xserver-utils nginx php-fpm php-apcu unclutter gnome-schedule fonts-unfonts-core ibus ibus-hangul"
+LIST="xscreensaver xinit x11-xserver-utils nginx php-fpm php-apcu unclutter gnome-schedule fonts-unfonts-core ibus ibus-hangul samba samba-common-bin"
 sudo apt-get install $LIST -y
 
 echo "finish install package"
