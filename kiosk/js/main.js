@@ -4,6 +4,14 @@
  *
  *
  */
+
+ /*
+    Debug Console Log Enable/Disable
+ */
+var DEBUG_EN = false;
+/*
+    Global Variables
+*/
 var response, response2, response3, response4;
 var uniq;
 var resource_id;
@@ -16,6 +24,8 @@ var fromtime = {
     current_day_time_start: 5,
     current_day_time_end: 6,
     current_time: 7,
+    before_aweek_today: 8,
+    after_aweek_today: 9,
 };
 var table;
 var alertX = null;
@@ -37,6 +47,52 @@ function get_dayoftheweek() {
     var week = ['일', '월', '화', '수', '목', '금', '토'];
     var dayOfWeek = week[new Date().getDay()];
     return dayOfWeek;
+}
+
+/*************************************************************************
+NAME
+DESCRIPTION
+RETURNS
+*/
+function get_a_week_afterbefore_from_today(type){
+    var date = new Date();
+    var result;
+    if (type == fromtime.before_aweek_today) {
+        date.setDate(date.getDate() - 7);
+    }
+    else if(type == fromtime.after_aweek_today){
+        date.setDate(date.getDate() + 7);
+    }
+    var dd = date.getDate();
+    var mm = date.getMonth() + 1;
+    var yyyy = date.getFullYear();
+    var h = date.getHours();
+    var m = date.getMinutes();
+    var s = date.getSeconds();
+
+    if (dd < 10) {
+        dd = '0' + dd
+    }
+    if (mm < 10) {
+        mm = '0' + mm
+    }
+    if (m < 10) {
+        m = '0' + m
+    }
+    if (s < 10) {
+        s = '0' + s
+    }
+
+    // 2018-11-07 00:30:00.000
+    if (type == fromtime.before_aweek_today) {
+        result = yyyy + '-' + mm + '-' + dd + ' ' + '00' + ':' + '00' + ':' + '00';
+    }
+    // 2018-11-21 23:30:00.000
+    else if (type == fromtime.after_aweek_today) {
+        result = yyyy + '-' + mm + '-' + dd + ' ' + '23' + ':' + '59' + ':' + '00';
+    }
+    //if(DEBUG_EN) console.log('> result time : ' + result);
+    return result;
 }
 
 /*************************************************************************
@@ -101,7 +157,7 @@ function today_time(type) {
         }
         today = h + ':' + m;
     }
-    //console.log('>' + today);
+    //if(DEBUG_EN) console.log('>' + today);
     return today;
 }
 
@@ -111,7 +167,7 @@ DESCRIPTION
 RETURNS
 */
 function doAjax(method, func, sdate, edate, res_seq, schedule_seq) {
-    console.log('>doAjax: ' + method);
+    if(DEBUG_EN) console.log('>doAjax: ' + method);
 
     var server, username, password, portnumber, dbname;
     var jsdate, jedate, jres_seq, jschedule_seq;
@@ -125,17 +181,17 @@ function doAjax(method, func, sdate, edate, res_seq, schedule_seq) {
     jres_seq = JSON.stringify(res_seq);
     jschedule_seq = JSON.stringify(schedule_seq);
 
-    console.log(server.concat("/", username, "/", password, "/", portnumber, "/", dbname));
+    if(DEBUG_EN) console.log(server.concat("/", username, "/", password, "/", portnumber, "/", dbname));
 
     ajax = theAjax(method, 'http://localhost/vscode-git/kiosk/php/GetDatabases.php',
         server, username, password, portnumber, dbname, jsdate, jedate, jres_seq, jschedule_seq);
     ajax.done(func);
     ajax.fail(function(msg){
-        console.log('ajax fail');
+        if(DEBUG_EN) console.log('ajax fail');
         //alert("error occured");
     });
     ajax.always(function(msg){
-        //console.log('ajax always');
+        //if(DEBUG_EN) console.log('ajax always');
         //alert("always occured");
     });
 }
@@ -146,7 +202,7 @@ DESCRIPTION
 RETURNS
 */
 function theAjax(method, url, server, username, password, portnum, dbname, sdate, edate, res_seq, schedule_seq) {
-    console.log('>theAjax');
+    if(DEBUG_EN) console.log('>theAjax');
     return $.ajax({
         type: 'POST',
         url: url,
@@ -174,27 +230,27 @@ RETURNS
 function changeLang_1_Select() {
     if(!getlistDB) return;
 
-    console.log(">database changeLangSelect");
+    //if(DEBUG_EN) console.log(">database changeLang_1_Select");
     $("#databases1 option").remove();
     text_clear();
 
-    for (var i = 0; i < response.data['database']['position'].length; i++) {
-        if ($("#databases option:selected").val() == response.data['database']['position'][i]) {
-            $("#databases1")
-                .append($('<option>', {
-                    text: response.data['database']['info'][i]
-                }));
+    if(response){
+        for (var i = 0; i < response.data['database']['position'].length; i++) {
+            if ($("#databases option:selected").val() == response.data['database']['position'][i]) {
+                //if(DEBUG_EN) console.log("1."+i)
+                $("#databases1")
+                    .append($('<option>', {
+                        text: response.data['database']['info'][i]
+                    }));
+            }
+            if ($("#databases option:selected").val() == response.data['database']['position'][i] &&
+                $("#databases1 option:selected").val() == response.data['database']['info'][i]) {
+                if(DEBUG_EN) console.log(response.data['database']['resource_seq'][i]);
+                resource_id = response.data['database']['resource_seq'][i];
+            }
         }
-        if ($("#databases option:selected").val() == response.data['database']['position'][i] &&
-            $("#databases1 option:selected").val() == response.data['database']['info'][i]) {
-            //console.log(response.data['database']['resource_seq'][i]);
-            resource_id = response.data['database']['resource_seq'][i];
-        }
+        text_display();
     }
-    text_display();
-    // get meeting room schedule list of database
-    //doAjax("Get_DB_cal_res_view", ret_Get_DB_cal_res_view, today_time(fromtime.current_day_time_start), today_time(fromtime.current_day_time_end));
-    //doAjax("Get_DB_cal_res_view", ret_Get_DB_cal_res_view, '2018-10-31 00:30:00.000', '2018-10-31 23:30:00.000');
 }
 
 /*************************************************************************
@@ -205,20 +261,19 @@ RETURNS
 function changeLang_2_Select() {
     if(!getlistDB) return;
 
-    console.log(">database1 changeLangSelect");
+    //if(DEBUG_EN) console.log(">database1 changeLang_2_Select");
     text_clear();
 
-    for (var i = 0; i < response.data['database']['position'].length; i++) {
-        if ($("#databases option:selected").val() == response.data['database']['position'][i] &&
-            $("#databases1 option:selected").val() == response.data['database']['info'][i]) {
-            console.log(response.data['database']['resource_seq'][i]);
-            resource_id = response.data['database']['resource_seq'][i];
+    if(response){
+        for (var i = 0; i < response.data['database']['position'].length; i++) {
+            if ($("#databases option:selected").val() == response.data['database']['position'][i] &&
+                $("#databases1 option:selected").val() == response.data['database']['info'][i]) {
+                if(DEBUG_EN) console.log(response.data['database']['resource_seq'][i]);
+                resource_id = response.data['database']['resource_seq'][i];
+            }
         }
+        text_display();
     }
-    text_display();
-    // get meeting room schedule list of database
-    //doAjax("Get_DB_cal_res_view", ret_Get_DB_cal_res_view, today_time(fromtime.current_day_time_start), today_time(fromtime.current_day_time_end));
-    //doAjax("Get_DB_cal_res_view", ret_Get_DB_cal_res_view, '2018-10-31 00:30:00.000', '2018-10-31 23:30:00.000');
 }
 
 /*************************************************************************
@@ -230,79 +285,103 @@ function text_display() {
     var text_array = new Array();
     var text_cnt = 0;
     var index = 0;
+    var status;
     var res_seq, schedule_seq, sdate, edate, actor, body;
-    for (var i = 0; i < response3.data['database']['schedule_seq'].length; i++) {
-        //response3.data['database']['schedule_seq'][i]
-        //response3.data['database']['view_start_date'][i].date
-        //response3.data['database']['view_end_date'][i].date
-        for (var k = 0; k < response2.data['database']['schedule_seq'].length; k++) {
-            //response2.data['database']['schedule_seq'][k]
-            //response2.data['database']['resource_seq'][k]
-            //response2.data['database']['actor'][k]
-            //response2.data['database']['body'][k]
+    //if(DEBUG_EN) console.log(">text_display");
 
-            if (response3.data['database']['schedule_seq'][i] === response2.data['database']['schedule_seq'][k] && response2.data['database']['resource_seq'][k] == resource_id) {
-                res_seq = response2.data['database']['resource_seq'][k];
-                schedule_seq = response3.data['database']['schedule_seq'][i];
-                sdate = response3.data['database']['view_start_date'][i].date.substring(11,16);
-                edate = response3.data['database']['view_end_date'][i].date.substring(11,16);
-                actor = response2.data['database']['actor'][k].replace(/▒/gi, ' ');
-                body = response2.data['database']['body'][k];
+    if(response2 && response3){
+        for (var i = 0; i < response3.data['database']['schedule_seq'].length; i++) {
+            //response3.data['database']['schedule_seq'][i]
+            //response3.data['database']['view_start_date'][i].date
+            //response3.data['database']['view_end_date'][i].date
+            for (var k = 0; k < response2.data['database']['schedule_seq'].length; k++) {
+                //response2.data['database']['schedule_seq'][k]
+                //response2.data['database']['resource_seq'][k]
+                //response2.data['database']['actor'][k]
+                //response2.data['database']['body'][k]
 
-                text_array[text_cnt] = new Array(4);
-                text_array[text_cnt][0] = sdate + ' ~ ' + edate;
-                text_array[text_cnt][1] = actor;
-                text_array[text_cnt][2] = body;
+                if (response3.data['database']['schedule_seq'][i] === response2.data['database']['schedule_seq'][k] && response2.data['database']['resource_seq'][k] == resource_id) {
+                    res_seq = response2.data['database']['resource_seq'][k];
+                    schedule_seq = response3.data['database']['schedule_seq'][i];
+                    sdate = response3.data['database']['view_start_date'][i].date.substring(0/*11*/,16);
+                    edate = response3.data['database']['view_end_date'][i].date.substring(0/*11*/,16);
+                    actor = response2.data['database']['actor'][k].replace(/▒/gi, ' ');
+                    body = response2.data['database']['body'][k];
 
-                var now = today_time(fromtime.current_time);
-                //console.log(now);
-                //console.log(sdate);
-                //console.log(edate);
-                if(sdate <= now && now < edate){
-                    text_array[text_cnt][3] = "진행중";
-                }else if(now >= edate){
-                    text_array[text_cnt][3] = "완료";
+                    // 2018-11-01 // 23:30:00
+                    var now = today_time(fromtime.current_day) + ' ' + today_time(fromtime.current_time);
+
+                    // schedule start ---- now ---- schedule stop
+                    if(sdate <= now && now < edate){
+                        status = "진행중";
+                    }
+                    // ---- now ------------------- schedule stop
+                    else if(now >= edate){
+                        // only today
+                        if(sdate.substring(0, 10) == today_time(fromtime.current_day))
+                        {
+                            status = "완료";
+                        }
+                        else{
+                            continue;
+                        }
+                    }
+                    // ---------------------------- schedule stop ---- now
+                    else if (now < edate){
+                        if(sdate.substring(0, 10) == today_time(fromtime.current_day))
+                        {
+                            status = "예정";
+                        }
+                        else{
+                            continue;
+                        }
+                    }
+                    // insert data
+                    text_array[text_cnt] = new Array(4);
+                    text_array[text_cnt][0] = sdate + ' ~ ' + edate;
+                    text_array[text_cnt][1] = actor;
+                    text_array[text_cnt][2] = body;
+                    text_array[text_cnt][3] = status;
+
+                    // index value is fist of remain schedule
+                    if(now < edate && index == 0){
+                        index = text_cnt/10;
+                        if(index < 1) index = 0;
+                        //if(DEBUG_EN) console.log('current position: '+text_cnt+', page number: '+index);
+                    }
+                    text_cnt++;
+                    /*var text_str =
+                        ' ' + res_seq + ',' +
+                        ' ' + schedule_seq + ',' +
+                        ' ' + sdate + ',' +
+                        ' ' + edate + ',' +
+                        ' ' + actor + ',' +
+                        ' ' + body;
+                    if(DEBUG_EN) console.log(text_str);*/
                 }
-                else{
-                    text_array[text_cnt][3] = "예정";
-                }
-                if(now < edate && index == 0){ index = text_cnt;} // index value is fist of remain schedule
-                text_cnt++;
-
-                var text_str =
-                    ' ' + res_seq + ',' +
-                    ' ' + schedule_seq + ',' +
-                    ' ' + sdate + ',' +
-                    ' ' + edate + ',' +
-                    ' ' + actor + ',' +
-                    ' ' + body;
-                //console.log(text_str);
-                //text_add(text_str);
-            }
+            };
         };
-    };
-    //console.log(text_array);
+        // display list
+        RemoveTable();
+        table = MakeMeetingRoomTable(text_array);
 
-    // display list
-    RemoveTable();
-    table = MakeMeetingRoomTable(text_array);
+        // highlight the current meeting room
+        for(var i=0; i<text_array.length; i++){
+            if(text_array[i][3] == "진행중"){
+                table.$('td', i).css('backgroundColor', 'blue');
+                table.$('td', i).css('color', 'white');
+                //table.$('tr:odd').css('backgroundColor', 'blue');
+            }
+            else{
+                table.$('td', i).css('backgroundColor', 'white');
+                table.$('td', i).css('color', 'black');
+                //table.$('tr:odd').css('backgroundColor', 'blue');
 
-    // highlight the current meeting room
-    for(var i=0; i<text_array.length; i++){
-        if(text_array[i][3] == "진행중"){
-            table.$('td', i).css('backgroundColor', 'blue');
-            table.$('td', i).css('color', 'white');
-            //table.$('tr:odd').css('backgroundColor', 'blue');
+            }
         }
-        else{
-            table.$('td', i).css('backgroundColor', 'white');
-            table.$('td', i).css('color', 'black');
-            //table.$('tr:odd').css('backgroundColor', 'blue');
-
-        }
+        // going current page
+        table.page(index).draw('page');
     }
-    // going current page
-    table.page(index/10).draw('page');
 }
 
 /*************************************************************************
@@ -331,7 +410,7 @@ RETURNS
 function text_add(num) {
     var $textarea = $('#total_text');
     var $test = num + '\n';
-    //console.log(num);
+    //if(DEBUG_EN) console.log(num);
     $textarea.append($test);
 }
 
@@ -341,9 +420,9 @@ DESCRIPTION
 RETURNS
 */
 function ret_Get_DB_cal_res(response_in) {
-    console.log('>ret_Get_DB_cal_res');
+    if(DEBUG_EN) console.log('>ret_Get_DB_cal_res');
     response = JSON.parse(response_in);
-    console.log(response);
+    if(DEBUG_EN) console.log(response);
 
     // return error
     if(response.success == false){
@@ -409,14 +488,16 @@ function ret_Get_DB_cal_res(response_in) {
         for (var i = 0; i < response.data['database']['position'].length; i++) {
             if ($("#databases option:selected").val() == response.data['database']['position'][i] &&
                 $("#databases1 option:selected").val() == response.data['database']['info'][i]) {
-                //console.log(response.data['database']['resource_seq'][i]);
+                if(DEBUG_EN) console.log(response.data['database']['resource_seq'][i]);
                 resource_id = response.data['database']['resource_seq'][i];
             }
         }
     }
     // get meeting room schedule list of database
-    doAjax("Get_DB_cal_res_view", ret_Get_DB_cal_res_view, today_time(fromtime.current_day_time_start), today_time(fromtime.current_day_time_end));
-    //doAjax("Get_DB_cal_res_view", ret_Get_DB_cal_res_view, '2018-10-31 00:30:00.000', '2018-10-31 23:30:00.000');
+    //doAjax("Get_DB_cal_res_view", ret_Get_DB_cal_res_view, today_time(fromtime.current_day_time_start), today_time(fromtime.current_day_time_end));
+    //doAjax("Get_DB_cal_res_view", ret_Get_DB_cal_res_view, '2018-11-06 00:30:00.000', '2018-11-20 23:30:00.000');
+    doAjax("Get_DB_cal_res_view", ret_Get_DB_cal_res_view, get_a_week_afterbefore_from_today(fromtime.before_aweek_today), get_a_week_afterbefore_from_today(fromtime.after_aweek_today));
+    getlistDB = true;
 }
 
 /*************************************************************************
@@ -425,9 +506,9 @@ DESCRIPTION
 RETURNS
 */
 function ret_Get_DB_cal_res_sch(response_in) {
-    console.log('>ret_Get_DB_cal_res_sch');
+    if(DEBUG_EN) console.log('>ret_Get_DB_cal_res_sch');
     response2 = JSON.parse(response_in);
-    console.log(response2);
+    if(DEBUG_EN) console.log(response2);
 
     // return error
     if(response2.success == false){
@@ -439,8 +520,6 @@ function ret_Get_DB_cal_res_sch(response_in) {
     else{
         $('#error_info').text('');
     }
-
-    //$("#total_text").empty();
     /*
     for(var i = 0; i < response2.data['database']['resource_seq'].length; i++)
     {
@@ -450,13 +529,11 @@ function ret_Get_DB_cal_res_sch(response_in) {
                        '4: '+response2.data['database']['sdate'][i].date+','+
                        '5: '+response2.data['database']['edate'][i].date+','+
                        '6: '+response2.data['database']['body'][i];
-        console.log(i);
-        //text_add(text_str);
+        if(DEBUG_EN) console.log(i);
     };
     */
     text_clear();
     text_display();
-    getlistDB = true;
 }
 
 /*************************************************************************
@@ -465,9 +542,9 @@ DESCRIPTION
 RETURNS
 */
 function ret_Get_DB_cal_res_view(response_in) {
-    console.log('>ret_Get_DB_cal_res_view');
+    if(DEBUG_EN) console.log('>ret_Get_DB_cal_res_view');
     response3 = JSON.parse(response_in);
-    console.log(response3);
+    if(DEBUG_EN) console.log(response3);
 
     // return error
     if(response3.success == false){
@@ -479,7 +556,6 @@ function ret_Get_DB_cal_res_view(response_in) {
     else{
         $('#error_info').text('');
     }
-
     /*
     for(var i = 0; i < response3.data['database']['schedule_seq'].length; i++)
     {
@@ -487,8 +563,7 @@ function ret_Get_DB_cal_res_view(response_in) {
                        '2: '+response3.data['database']['schedule_seq'][i]+','+
                        '3: '+response3.data['database']['view_start_date'][i].date+','+
                        '4: '+response3.data['database']['view_end_date'][i].date;
-         console.log(i);
-        //text_add(text_str);
+         if(DEBUG_EN) console.log(i);
     };
     */
     doAjax("Get_DB_cal_res_sch", ret_Get_DB_cal_res_sch, today_time(fromtime.current_year_start), today_time(fromtime.current_year_end));
@@ -509,10 +584,10 @@ function MakeMeetingRoomTable(data_array){
            "footer": false
        },
         "columnDefs": [
-            { "width": "20px", "targets": 0 },  // 예약 시간
+            { "width": "100px", "targets": 0 },  // 예약 시간
             { "width": "100px", "targets": 1 },  // 주관자
             { "width": "220px", "targets": 2 }, // 회의 제목
-            { "width": "10px", "targets": 3 },  // 진행 상황
+            { "width": "100px", "targets": 3 },  // 진행 상황
         ],
         "language": {
             "paginate": {
@@ -551,7 +626,7 @@ RETURNS
 */
 $(function () {
     $(document).ready(function () {
-        console.log('ready');
+        if(DEBUG_EN) console.log('ready');
         // init resource load ----------------------------
         // ui_init
         text_init();
