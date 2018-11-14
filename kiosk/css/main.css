@@ -277,9 +277,9 @@ img { vertical-align: middle; }
     font-weight: bold;
     width: 100%;
     margin: 0 auto;
-    height: 120px;
-    line-height: 50px;
-    letter-spacing: 0.20em;
+     height: 60px;
+    line-height: 20px;
+/*    letter-spacing: 0.20em; */
 }
 .page-footer a {
     color: #000;  /*sypark. background color*/

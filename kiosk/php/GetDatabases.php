@@ -114,9 +114,9 @@ echo $_POST["method"]();
             }
         }
         $return->errorMessage = sqlsrv_errors();
+        Disconnect_Databases();
         $return->data['database'] = $databaseNames;
         $json = json_encode($return);
-        Disconnect_Databases();
         echo $json;
     }
 
@@ -186,9 +186,9 @@ echo $_POST["method"]();
             }
         }
         $return->errorMessage = sqlsrv_errors();
+        Disconnect_Databases();
         $return->data['database'] = $databaseNames;
         $json = json_encode($return);
-        Disconnect_Databases();
         echo $json;
     }
 
@@ -214,8 +214,7 @@ echo $_POST["method"]();
             $edate = json_decode($_POST['edate']);
         }
 
-        if($conn == true)
-        {
+        if($conn == true) {
             // primary key : view_start_date BETWEEN '2018-10-31 00:30:00.000' and '2018-10-31 23:30:00' ORDER BY view_start_date asc
             $sql = "SELECT * FROM dbo.cal_res_view WHERE view_start_date BETWEEN '$sdate' and '$edate' ORDER BY view_start_date asc";
             $params = array();
@@ -244,9 +243,9 @@ echo $_POST["method"]();
             }
         }
         $return->errorMessage = sqlsrv_errors();
+        Disconnect_Databases();
         $return->data['database'] = $databaseNames;
         $json = json_encode($return);
-        Disconnect_Databases();
         echo $json;
     }
 //}

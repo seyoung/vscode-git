@@ -4,11 +4,10 @@
  *
  *
  */
-var response, response2, response3;
+var response, response2, response3, response4;
 var uniq;
 var resource_id;
 var today;
-var index, index1;
 var fromtime = {
     current_year_start: 1,
     current_year_end: 2,
@@ -20,6 +19,7 @@ var fromtime = {
 };
 var table;
 var alertX = null;
+var getlistDB = false;
 
 /**
 The data that will be show by the data table
@@ -130,8 +130,13 @@ function doAjax(method, func, sdate, edate, res_seq, schedule_seq) {
     ajax = theAjax(method, 'http://localhost/vscode-git/kiosk/php/GetDatabases.php',
         server, username, password, portnumber, dbname, jsdate, jedate, jres_seq, jschedule_seq);
     ajax.done(func);
-    ajax.fail(function () {
-        alert("Failure");
+    ajax.fail(function(msg){
+        console.log('ajax fail');
+        //alert("error occured");
+    });
+    ajax.always(function(msg){
+        //console.log('ajax always');
+        //alert("always occured");
     });
 }
 
@@ -156,7 +161,8 @@ function theAjax(method, url, server, username, password, portnum, dbname, sdate
             edate: edate,
             res_seq: res_seq,
             schedule_seq: schedule_seq
-        }
+        },
+        cache: false
     });
 }
 
@@ -166,6 +172,8 @@ DESCRIPTION
 RETURNS
 */
 function changeLang_1_Select() {
+    if(!getlistDB) return;
+
     console.log(">database changeLangSelect");
     $("#databases1 option").remove();
     text_clear();
@@ -179,7 +187,7 @@ function changeLang_1_Select() {
         }
         if ($("#databases option:selected").val() == response.data['database']['position'][i] &&
             $("#databases1 option:selected").val() == response.data['database']['info'][i]) {
-            console.log(response.data['database']['resource_seq'][i]);
+            //console.log(response.data['database']['resource_seq'][i]);
             resource_id = response.data['database']['resource_seq'][i];
         }
     }
@@ -187,8 +195,6 @@ function changeLang_1_Select() {
     // get meeting room schedule list of database
     //doAjax("Get_DB_cal_res_view", ret_Get_DB_cal_res_view, today_time(fromtime.current_day_time_start), today_time(fromtime.current_day_time_end));
     //doAjax("Get_DB_cal_res_view", ret_Get_DB_cal_res_view, '2018-10-31 00:30:00.000', '2018-10-31 23:30:00.000');
-    //index = $("#databases option:selected").val();
-    //index1 = $("#databases1 option:selected").val();
 }
 
 /*************************************************************************
@@ -197,6 +203,8 @@ DESCRIPTION
 RETURNS
 */
 function changeLang_2_Select() {
+    if(!getlistDB) return;
+
     console.log(">database1 changeLangSelect");
     text_clear();
 
@@ -211,8 +219,6 @@ function changeLang_2_Select() {
     // get meeting room schedule list of database
     //doAjax("Get_DB_cal_res_view", ret_Get_DB_cal_res_view, today_time(fromtime.current_day_time_start), today_time(fromtime.current_day_time_end));
     //doAjax("Get_DB_cal_res_view", ret_Get_DB_cal_res_view, '2018-10-31 00:30:00.000', '2018-10-31 23:30:00.000');
-    //index = $("#databases option:selected").val();
-    //index1 = $("#databases1 option:selected").val();
 }
 
 /*************************************************************************
@@ -223,6 +229,7 @@ RETURNS
 function text_display() {
     var text_array = new Array();
     var text_cnt = 0;
+    var index = 0;
     var res_seq, schedule_seq, sdate, edate, actor, body;
     for (var i = 0; i < response3.data['database']['schedule_seq'].length; i++) {
         //response3.data['database']['schedule_seq'][i]
@@ -248,9 +255,9 @@ function text_display() {
                 text_array[text_cnt][2] = body;
 
                 var now = today_time(fromtime.current_time);
-                console.log(now);
-                console.log(sdate);
-                console.log(edate);
+                //console.log(now);
+                //console.log(sdate);
+                //console.log(edate);
                 if(sdate <= now && now < edate){
                     text_array[text_cnt][3] = "진행중";
                 }else if(now >= edate){
@@ -259,6 +266,7 @@ function text_display() {
                 else{
                     text_array[text_cnt][3] = "예정";
                 }
+                if(now < edate && index == 0){ index = text_cnt;} // index value is fist of remain schedule
                 text_cnt++;
 
                 var text_str =
@@ -268,12 +276,12 @@ function text_display() {
                     ' ' + edate + ',' +
                     ' ' + actor + ',' +
                     ' ' + body;
-                console.log(text_str);
+                //console.log(text_str);
                 //text_add(text_str);
             }
         };
     };
-    console.log(text_array);
+    //console.log(text_array);
 
     // display list
     RemoveTable();
@@ -293,6 +301,8 @@ function text_display() {
 
         }
     }
+    // going current page
+    table.page(index/10).draw('page');
 }
 
 /*************************************************************************
@@ -321,7 +331,7 @@ RETURNS
 function text_add(num) {
     var $textarea = $('#total_text');
     var $test = num + '\n';
-    console.log(num);
+    //console.log(num);
     $textarea.append($test);
 }
 
@@ -334,6 +344,17 @@ function ret_Get_DB_cal_res(response_in) {
     console.log('>ret_Get_DB_cal_res');
     response = JSON.parse(response_in);
     console.log(response);
+
+    // return error
+    if(response.success == false){
+        $.each(response.errorMessage, function (key, value) {
+            $('#error_info').text(value.message);
+        });
+        return;
+    }
+    else{
+        $('#error_info').text('');
+    }
 
     /* delete meeting room position */
     $("#databases option").remove();
@@ -388,7 +409,7 @@ function ret_Get_DB_cal_res(response_in) {
         for (var i = 0; i < response.data['database']['position'].length; i++) {
             if ($("#databases option:selected").val() == response.data['database']['position'][i] &&
                 $("#databases1 option:selected").val() == response.data['database']['info'][i]) {
-                console.log(response.data['database']['resource_seq'][i]);
+                //console.log(response.data['database']['resource_seq'][i]);
                 resource_id = response.data['database']['resource_seq'][i];
             }
         }
@@ -408,6 +429,17 @@ function ret_Get_DB_cal_res_sch(response_in) {
     response2 = JSON.parse(response_in);
     console.log(response2);
 
+    // return error
+    if(response2.success == false){
+        $.each(response2.errorMessage, function (key, value) {
+            $('#error_info').text(value.message);
+        });
+        return;
+    }
+    else{
+        $('#error_info').text('');
+    }
+
     //$("#total_text").empty();
     /*
     for(var i = 0; i < response2.data['database']['resource_seq'].length; i++)
@@ -424,6 +456,7 @@ function ret_Get_DB_cal_res_sch(response_in) {
     */
     text_clear();
     text_display();
+    getlistDB = true;
 }
 
 /*************************************************************************
@@ -435,6 +468,17 @@ function ret_Get_DB_cal_res_view(response_in) {
     console.log('>ret_Get_DB_cal_res_view');
     response3 = JSON.parse(response_in);
     console.log(response3);
+
+    // return error
+    if(response3.success == false){
+        $.each(response3.errorMessage, function (key, value) {
+            $('#error_info').text(value.message);
+        });
+        return;
+    }
+    else{
+        $('#error_info').text('');
+    }
 
     /*
     for(var i = 0; i < response3.data['database']['schedule_seq'].length; i++)
@@ -530,7 +574,6 @@ $(function () {
         // alarm setting
         alertX = $.dialog.alert;
     });
-
     /*
      * Tabs
      */
@@ -601,12 +644,14 @@ $(function () {
         .marquee({
             duration: 10000
         });
-        /*
+
         $('#alertXX').bind('click', function () {
-            alertX("회의실 시작 10분전", "08:30 ~ 15:30 <br> 품질보증팀 조우규 주임 <br> 품질보증팀 계측기 관리방안 회의", function () {
+            table.page(1).draw('page');
+            /* table.page('next').draw('page');
+            table.page('previous').draw('page'); */
+            /*alertX("회의실 시작 10분전", "08:30 ~ 15:30 <br> 품질보증팀 조우규 주임 <br> 품질보증팀 계측기 관리방안 회의", function () {
                 //$.dialog.alert("Alert", "Closed");
-            });
+            });*/
         });
-        */
     });
 });
