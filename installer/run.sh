@@ -12,7 +12,7 @@ matchbox-keyboard &
 
 while true; do
 
-DISPLAY=:0 chromium-browser --disable-translate --noerrdialogs --kiosk --touch-events=enabled --virtual-keyboard --disable-pinch --noerrdialogs --disable-session-crashed-bubble --app=http://127.0.0.1/DreamtechWeb/index.html --incognito
+DISPLAY=:0 chromium-browser --disable-translate --noerrdialogs --kiosk --touch-events=enabled --virtual-keyboard --disable-pinch --noerrdialogs --disable-session-crashed-bubble --app=http://127.0.0.1/kiosk/index.html --incognito
 
 done
 

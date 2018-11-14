@@ -1,5 +1,5 @@
-wget https://github.com/keepworking/RPS_BOARD/archive/master.zip
-unzip master.zip
-rm master.zip
-cp -R -f RPS_BOARD-master/* /var/www/html/
-rm -r RPS_BOARD-master/
+wget https://github.com/seyoung/vscode-git/archive/vscode-git-master.zip
+unzip vscode-git-master.zip
+rm vscode-git-master.zip
+cp -R -f vscode-git-master/* /var/www/html/
+rm -r vscode-git-master/

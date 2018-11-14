@@ -11,15 +11,15 @@ echo "finish install package"
 
 apt-get remove xscreensaver -y
 
-wget https://raw.githubusercontent.com/keepworking/PI_SIGNAGE/master/update.sh
+wget https://github.com/seyoung/vscode-git/tree/master/installer/update.sh
 chmod +x update.sh
 
 ./update.sh
 
-wget https://raw.githubusercontent.com/keepworking/PI_SIGNAGE/master/run.sh
+wget https://github.com/seyoung/vscode-git/tree/master/installer/run.sh
 chmod +x run.sh
 
-wget https://raw.githubusercontent.com/keepworking/PI_SIGNAGE/master/default
+wget https://github.com/seyoung/vscode-git/tree/master/installer/default
 mv default /etc/nginx/sites-available/default
 #nginx setting file download
 
@@ -33,8 +33,6 @@ echo "@reboot /home/pi/run.sh &" >> mycron
 echo "* * * * * wget -O /var/www/html/weather.txt http://www.kma.go.kr/wid/queryDFSRSS.jsp?zone=4420035000" >> mycron
 crontab -u pi mycron
 rm mycron
-
-
 
 echo ""
 echo "next install the chromium-borwser :)"
