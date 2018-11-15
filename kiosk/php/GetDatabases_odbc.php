@@ -8,7 +8,7 @@
 //$object = new mssql_db;
 //$object->Connect_Databases();
 //echo $_POST["method"]();
-Connect_Databases();
+Get_DB_cal_res();
 
 //$row_count = sqlsrv_num_rows( $stmt );
 //echo "Row count result = $row_count\n";
