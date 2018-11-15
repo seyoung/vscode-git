@@ -44,7 +44,7 @@ Get_DB_cal_res();
         if(isset($_POST['dbname'])) {
             $dbname = json_decode($_POST['dbname']);
         } */
-
+/*
         $connectionTimeoutSeconds = 15;  // Default of 15 seconds
         $serverName = $server;
         $connectionOptions = array(
@@ -52,14 +52,16 @@ Get_DB_cal_res();
             "UID"=>"dreamtech01",
             "PWD"=>"dreamtech01",
             "CharacterSet" => "UTF-8",
-            "LoginTimeout" => $connectionTimeoutSeconds);
+            "LoginTimeout" => $connectionTimeoutSeconds); */
 
         //debug_to_console($connectionOptions);
         //sqlsrv_configure('WarningsReturnAsErrors', true);
         //sqlsrv_configure('LogSubsystems', SQLSRV_LOG_SYSTEM_ALL);
         //sqlsrv_configure('LogSeverity', SQLSRV_LOG_SEVERITY_ALL);
 
-        $conn = sqlsrv_connect( $serverName, $connectionOptions);
+        //$conn = sqlsrv_connect( $serverName, $connectionOptions);
+        $conn = odbc_connect("Driver={SQL Server Native Client 10.0};Server=192.168.1.200;Database=WO2011;", "dreamtech01", "dreamtech01");
+
         return $conn;
     }
 
