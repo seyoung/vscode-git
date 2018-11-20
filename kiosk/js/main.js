@@ -8,7 +8,7 @@
  /*
     Debug Console Log Enable/Disable
  */
-var DEBUG_EN = false;
+var DEBUG_EN = true;
 /*
     Global Variables
 */
@@ -630,7 +630,7 @@ $(function () {
         // init resource load ----------------------------
         // ui_init
         text_init();
-        doAjax("Get_DB_cal_res", ret_Get_DB_cal_res);
+        //doAjax("Get_DB_cal_res", ret_Get_DB_cal_res);
 
         // time display
         setInterval(function(){
@@ -643,7 +643,7 @@ $(function () {
 
         setInterval(function(){
             // get meeting room list of database
-            doAjax("Get_DB_cal_res", ret_Get_DB_cal_res);
+            //doAjax("Get_DB_cal_res", ret_Get_DB_cal_res);
         },1000*(60*1)/*30초*/);
 
         // alarm setting
@@ -721,7 +721,60 @@ $(function () {
         });
 
         $('#alertXX').bind('click', function () {
-            table.page(1).draw('page');
+
+            //alert('Im going to start processing');
+            $.ajax({
+                type: 'GET',
+                url: "http://127.0.0.1:5000/get_db_cal_res",
+                dataType: "json",
+                crossDomain: true,
+                success: function (response) {
+                    output = response;
+                    alert(output);
+                }
+            }).done(function (data) {
+                console.log(data);
+            });
+/*             $.ajax({
+                url: "http://localhost/vscode-git/kiosk/py/test.py",
+                type: "POST",
+                cache:false,
+                datatype:"json",
+                data: {param: '123'},
+                success: function(msg){
+                    console.log(msg)
+                    alert(msg.message);
+                    alert(msg.keys);
+                },
+                error: function(msg){
+                    alert('msg')
+                }
+            }); */
+
+/*             var user = 'seyoung';
+            var pass = 'seyoung_pwd';
+            $.ajax({
+                url: "http://127.0.0.1:5000/test",
+                data: JSON.stringify({username: user, password: pass}),
+                type: 'POST',
+                headers: {'Content-Type':'application/json'},
+                success: function(response){
+                    console.log(response);
+                },
+                error: function(error){
+                    console.log(error);
+                }
+            }); */
+
+            //$SCRIPT_ROOT = request.script_root|tojson|safe;
+/*             $.getJSON('/_add_numbers', {
+                a: $('input[name="a"]').val(),
+                b: $('input[name="b"]').val()
+              }, function(data) {
+                console.log(data.result);
+              }); */
+
+            /* table.page(1).draw('page'); */
             /* table.page('next').draw('page');
             table.page('previous').draw('page'); */
             /*alertX("회의실 시작 10분전", "08:30 ~ 15:30 <br> 품질보증팀 조우규 주임 <br> 품질보증팀 계측기 관리방안 회의", function () {
