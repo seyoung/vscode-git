@@ -25,6 +25,7 @@ server = '192.168.1.200'
 database = 'WO2011'
 username = 'dreamtech01'
 password = 'dreamtech01'
+port = '1433'
 
 """
     NAME
@@ -57,7 +58,11 @@ if __name__ == "__main__":
 def Connect_Databases():
     print('Connect_Databases')
     try:
-        connect = pyodbc.connect('DRIVER={ODBC Driver 17 for SQL Server};SERVER='+server+';DATABASE='+database+';UID='+username+';PWD='+ password)
+        #'DRIVER=FreeTDS;SERVER=192.168.1.200;PORT=1433;DATABASE=WO2011;UID=dreamtech01;PWD=dreamtech01;TDS_Version=4.2;'
+        #'DRIVER={ODBC Driver 17 for SQL Server};SERVER='+server+';DATABASE='+database+';UID='+username+';PWD='+ password
+        #'DRIVER={ODBC Driver 17 for SQL Server};SERVER=192.168.1.200;PORT=1433;DATABASE=WO2011;UID=dreamtech01;PWD=dreamtech01;TDS_Version=4.2;'
+        connect = pyodbc.connect('DRIVER={FreeTDS};SERVER='+server+';PORT='+port+';DATABASE='+database+';UID='+username+';PWD='+ password)
+        #connect = pyodbc.connect('DRIVER={ODBC Driver 17 for SQL Server};SERVER='+server+';PORT='+port+';DATABASE='+database+';UID='+username+';PWD='+ password)
     except pyodbc.Error as ex:
         sqlstate = ex.args[0]
         print("LDAP Connection failed: check password")
