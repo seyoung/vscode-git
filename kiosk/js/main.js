@@ -20,12 +20,16 @@ var CODE_RUN_PY = true;
 // If used with php (CODE_RUN_PY = false), CODE_RUN_WINDOWS value is meaningless.
 var CODE_RUN_WINDOWS = false;
 
+// true: from info.txt, false: none
+var FIXED_ROOM_FROM_TXT = true;
+
 /*
     Global Variables
 */
 var response, response2, response3, response4;
 var uniq;
 var resource_id;
+var fixed_id;
 var today;
 var fromtime = {
     current_year_start: 1,
@@ -543,6 +547,10 @@ function ret_Get_DB_cal_res(response_in) {
             }));
     });
 
+    if(FIXED_ROOM_FROM_TXT == true){
+        resource_id = fixed_id;
+    }else{}
+
     if(resource_id != null){
         /* select previous meeting room position */
         for (var i = 0; i < response.data['database']['position'].length; i++) {
@@ -770,14 +778,94 @@ NAME
 DESCRIPTION
 RETURNS
 */
+function findFlagInfo(str)
+{
+    if(DEBUG_EN) console.log(">findFlagInfo >> "+str);
+    var f = "http://localhost/vscode-git/kiosk/file/info.txt";
+    ReadTextFile(f, str);
+}
+
+/*************************************************************************
+NAME
+DESCRIPTION
+RETURNS
+*/
+function ReadTextFile(afilename, str)
+{
+    var info_array = new Array();
+
+    $.get(afilename, function(data) {
+        //if(DEBUG_EN) console.log(data);
+        var lines = data.split("\n");
+        $.each(lines, function(n, elem) {
+            var config_data = elem.split("=") ;
+            info_array[n] = new Array(2);
+            $.each(config_data, function(i, config) {
+                info_array[n][i] = config
+                //info_array[n+i] = config
+                //if(DEBUG_EN) console.log('*'+info_array[n+i])
+            })
+        })
+    })
+    setTimeout(function() {
+        $.each(info_array, function(i, config) {
+            if(info_array[i][0] == str)
+                fixed_id = info_array[i][1];
+                console.log('\r\n fixed_id:'+fixed_id+'\r\n');
+        })
+    }, 500);
+    return;
+}
+
+/*************************************************************************
+NAME
+DESCRIPTION
+RETURNS
+*/
+function sleep(milliseconds) {
+    var start = new Date().getTime();
+    for (var i = 0; i < 1e7; i++) {
+        if ((new Date().getTime() - start) > milliseconds){
+            break;
+        }
+    }
+}
+
+/*************************************************************************
+NAME
+DESCRIPTION
+RETURNS
+*/
+function WriteTextFile(afilename, output)
+{
+}
+
+/*************************************************************************
+NAME
+DESCRIPTION
+RETURNS
+*/
 $(function () {
     $(document).ready(function () {
         if(DEBUG_EN) console.log('ready');
         // init resource load ----------------------------
         // ui_init
         text_init();
-        if(CODE_RUN_PY == true){ doAjax_py("Get_DB_cal_res", ret_Get_DB_cal_res); }
-        else{ doAjax("Get_DB_cal_res", ret_Get_DB_cal_res); }
+        findFlagInfo('resource_id');
+
+        // Init start DB List
+        setTimeout(function() {
+            if(CODE_RUN_PY == true){ doAjax_py("Get_DB_cal_res", ret_Get_DB_cal_res); }
+            else{ doAjax("Get_DB_cal_res", ret_Get_DB_cal_res); }
+
+            // Restart DB List
+            setInterval(function(){
+                findFlagInfo('resource_id');
+                // get meeting room list of database
+                if(CODE_RUN_PY == true){ doAjax_py("Get_DB_cal_res", ret_Get_DB_cal_res); }
+                else{ doAjax("Get_DB_cal_res", ret_Get_DB_cal_res); }
+            },1000*(60*1)/*30초*/);
+        }, 1000);
 
         // time display
         setInterval(function(){
@@ -787,13 +875,6 @@ $(function () {
             var s = timer.getSeconds();
             document.getElementById('clock').innerHTML = today_time(fromtime.current_day_time);
         },1000);
-
-        setInterval(function(){
-            // get meeting room list of database
-            if(CODE_RUN_PY == true){ doAjax_py("Get_DB_cal_res", ret_Get_DB_cal_res); }
-            else{ doAjax("Get_DB_cal_res", ret_Get_DB_cal_res); }
-        },1000*(60*1)/*30초*/);
-
         // alarm setting
         alertX = $.dialog.alert;
     });
