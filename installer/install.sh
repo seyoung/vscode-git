@@ -6,19 +6,32 @@ sudo apt-get update
 sudo apt-get upgrade
 
 #LIST="xinit x11-xserver-utils nginx php5-fpm php-apc unclutter gnome-schedule ttf-unfonts-core ibus ibus-hangul"
-LIST1="xscreensaver xinit x11-xserver-utils nginx php-fpm php-apcu unclutter gnome-schedule fonts-unfonts-core ibus ibus-hangul samba samba-common-bin git-core vim openssh-server ssh"
+LIST1="xscreensaver xinit x11-xserver-utils nginx php-fpm php-apcu unclutter gnome-schedule fonts-unfonts-core ibus ibus-hangul samba samba-common-bin git-core vim openssh-server ssh python-pip"
 sudo apt-get install $LIST1 -y
 
 # ssh server restart
 sudo /etc/init.d/ssh restart
 
-# for touch screen calc because rotate screen
-LIST2="libx11-dev libxext-dev libxi-dev x11proto-input-dev xinput_calibrator"
+# Free tds & unixodbc install
+LIST2="freetds-dev freetds-bin unixodbc-dev tdsodbc"
 sudo apt-get install $LIST2 -y
 
+# /etc/odbcinst.ini
+#[FreeTDS]
+# Driver = /usr/lib/arm-linux-gnueabihf/odbc/libtdsodbc.so
+sudo cp /var/www/html/kiosk/file/odbcinst.ini /etc
+
+# for touch screen calc because rotate screen
+LIST3="libx11-dev libxext-dev libxi-dev x11proto-input-dev xinput-calibrator"
+sudo apt-get install $LIST3 -y
+
+# Error List
+#xinput_calibrator
+#flash_cors
+
 # for python package
-LIST3="app flask flash_cors json pyodbc"
-sudo pip install $LIST3
+LIST4="app flask flask_cors json pyodbc"
+sudo pip install $LIST4
 
 echo "finish install package"
 
