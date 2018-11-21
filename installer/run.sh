@@ -10,7 +10,7 @@ xset s 0 0
 #matchbox-window-manager &
 #matchbox-keyboard &
 
-while true; do
+#while true; do
 # excute the background python app
 python /var/www/html/kiosk/py/GetDatabases.py &
 echo "5"
@@ -30,7 +30,7 @@ DISPLAY=:0 chromium-browser --disable-translate --noerrdialogs --kiosk --touch-e
 # kill the background python app
 killall -9 python
 killall -9 chromium-browse
-done
+#done
 
 #while true; do
 #	#sudo matchbox-window-manager -use_cursor no -use_titlebar no &
