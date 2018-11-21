@@ -2,6 +2,8 @@
 cd /home/pi/
 
 echo "start install"
+sudo apt-get update
+sudo apt-get upgrade
 
 #LIST="xinit x11-xserver-utils nginx php5-fpm php-apc unclutter gnome-schedule ttf-unfonts-core ibus ibus-hangul"
 LIST1="xscreensaver xinit x11-xserver-utils nginx php-fpm php-apcu unclutter gnome-schedule fonts-unfonts-core ibus ibus-hangul samba samba-common-bin"

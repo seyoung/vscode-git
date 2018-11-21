@@ -1,14 +1,25 @@
-/*  Prototype Dreamtech Kiosk, version 1.0.0.0
+/**************************************************************************************
+ *  Prototype Dreamtech Kiosk, version 1.0.0.0
  *  (c) 2018-2019 Seyoung Park.
  *
  *
  *
- */
+ **************************************************************************************/
 
  /*
-    Debug Console Log Enable/Disable
+    Global Define Enable/Disable
  */
+
+ // true: console.log enable, false: console.log disable
 var DEBUG_EN = true;
+
+// true: python, false: php
+var CODE_RUN_PY = true;
+
+// true: windows, false: raspberry pi 3
+// If used with php (CODE_RUN_PY = false), CODE_RUN_WINDOWS value is meaningless.
+var CODE_RUN_WINDOWS = false;
+
 /*
     Global Variables
 */
@@ -227,6 +238,70 @@ NAME
 DESCRIPTION
 RETURNS
 */
+function doAjax_py(method=null, func=null, sdate=null, edate=null, res_seq=null, schedule_seq=null) {
+    if(DEBUG_EN) console.log('>doAjax_py: ' + method);
+
+    var server, username, password, portnumber, dbname;
+    var jsdate, jedate, jres_seq, jschedule_seq;
+    server = JSON.stringify($('#server').val());
+    username = JSON.stringify($('#username').val());
+    password = JSON.stringify($('#password').val());
+    portnumber = JSON.stringify($('#portnumber').val());
+    dbname = JSON.stringify($('#dbname').val());
+    jsdate = JSON.stringify(sdate);
+    jedate = JSON.stringify(edate);
+    jres_seq = JSON.stringify(res_seq);
+    jschedule_seq = JSON.stringify(schedule_seq);
+
+    if(DEBUG_EN) console.log(server.concat("/", username, "/", password, "/", portnumber, "/", dbname));
+
+    ajax = theAjax_py(/*method,*/ 'http://127.0.0.1:5000/'+method,
+        server, username, password, portnumber, dbname, jsdate, jedate, jres_seq, jschedule_seq);
+    ajax.done(func);
+    ajax.fail(function(msg){
+        if(DEBUG_EN) console.log('ajax fail');
+        //alert("error occured");
+    });
+    ajax.always(function(msg){
+        //if(DEBUG_EN) console.log('ajax always');
+        //alert("always occured");
+    });
+}
+
+/*************************************************************************
+NAME
+DESCRIPTION
+RETURNS
+*/
+function theAjax_py(/*method, */url, server, username, password, portnum, dbname, sdate, edate, res_seq, schedule_seq) {
+    if(DEBUG_EN) console.log('>theAjax_py');
+    return $.ajax({
+        type: 'POST',//'POST' 'GET',
+        url: url,
+        dataType: "json",
+        data: {
+            /*method: method,*/
+            server: server,
+            username: username,
+            password: password,
+            portnum: portnum,
+            dbname: dbname,
+            sdate: sdate,
+            edate: edate,
+            res_seq: res_seq,
+            schedule_seq: schedule_seq,
+            run: CODE_RUN_WINDOWS,
+        },
+        crossDomain: true,
+        cache: false
+    });
+}
+
+/*************************************************************************
+NAME
+DESCRIPTION
+RETURNS
+*/
 function changeLang_1_Select() {
     if(!getlistDB) return;
 
@@ -303,8 +378,16 @@ function text_display() {
                 if (response3.data['database']['schedule_seq'][i] === response2.data['database']['schedule_seq'][k] && response2.data['database']['resource_seq'][k] == resource_id) {
                     res_seq = response2.data['database']['resource_seq'][k];
                     schedule_seq = response3.data['database']['schedule_seq'][i];
-                    sdate = response3.data['database']['view_start_date'][i].date.substring(0/*11*/,16);
-                    edate = response3.data['database']['view_end_date'][i].date.substring(0/*11*/,16);
+
+                    if(CODE_RUN_PY == true){
+                        sdate = response3.data['database']['view_start_date'][i].substring(0/*11*/,16);
+                        edate = response3.data['database']['view_end_date'][i].substring(0/*11*/,16);
+                    }
+                    else{
+                        sdate = response3.data['database']['view_start_date'][i].date.substring(0/*11*/,16);
+                        edate = response3.data['database']['view_end_date'][i].date.substring(0/*11*/,16);
+                    }
+
                     actor = response2.data['database']['actor'][k].replace(/▒/gi, ' ');
                     body = response2.data['database']['body'][k];
 
@@ -421,14 +504,20 @@ RETURNS
 */
 function ret_Get_DB_cal_res(response_in) {
     if(DEBUG_EN) console.log('>ret_Get_DB_cal_res');
-    response = JSON.parse(response_in);
+    if(CODE_RUN_PY == true){ response = response_in; }
+    else{ response = JSON.parse(response_in); }
     if(DEBUG_EN) console.log(response);
 
     // return error
     if(response.success == false){
-        $.each(response.errorMessage, function (key, value) {
-            $('#error_info').text(value.message);
-        });
+        if(CODE_RUN_PY == true){
+            $('#error_info').text(response.errorMessage);
+        }
+        else {
+            $.each(response.errorMessage, function (key, value) {
+                $('#error_info').text(response.errorMessage);
+            });
+        }
         return;
     }
     else{
@@ -493,10 +582,16 @@ function ret_Get_DB_cal_res(response_in) {
             }
         }
     }
+
     // get meeting room schedule list of database
-    //doAjax("Get_DB_cal_res_view", ret_Get_DB_cal_res_view, today_time(fromtime.current_day_time_start), today_time(fromtime.current_day_time_end));
-    //doAjax("Get_DB_cal_res_view", ret_Get_DB_cal_res_view, '2018-11-06 00:30:00.000', '2018-11-20 23:30:00.000');
-    doAjax("Get_DB_cal_res_view", ret_Get_DB_cal_res_view, get_a_week_afterbefore_from_today(fromtime.before_aweek_today), get_a_week_afterbefore_from_today(fromtime.after_aweek_today));
+    if(CODE_RUN_PY == true){
+        doAjax_py("Get_DB_cal_res_view", ret_Get_DB_cal_res_view, get_a_week_afterbefore_from_today(fromtime.before_aweek_today), get_a_week_afterbefore_from_today(fromtime.after_aweek_today));
+    }
+    else{
+        //doAjax("Get_DB_cal_res_view", ret_Get_DB_cal_res_view, today_time(fromtime.current_day_time_start), today_time(fromtime.current_day_time_end));
+        //doAjax("Get_DB_cal_res_view", ret_Get_DB_cal_res_view, '2018-11-06 00:30:00.000', '2018-11-20 23:30:00.000');
+        doAjax("Get_DB_cal_res_view", ret_Get_DB_cal_res_view, get_a_week_afterbefore_from_today(fromtime.before_aweek_today), get_a_week_afterbefore_from_today(fromtime.after_aweek_today));
+    }
     getlistDB = true;
 }
 
@@ -507,14 +602,20 @@ RETURNS
 */
 function ret_Get_DB_cal_res_sch(response_in) {
     if(DEBUG_EN) console.log('>ret_Get_DB_cal_res_sch');
-    response2 = JSON.parse(response_in);
+    if(CODE_RUN_PY == true){ response2 = response_in; }
+    else{ response2 = JSON.parse(response_in); }
     if(DEBUG_EN) console.log(response2);
 
     // return error
     if(response2.success == false){
-        $.each(response2.errorMessage, function (key, value) {
-            $('#error_info').text(value.message);
-        });
+        if(CODE_RUN_PY == true){
+            $('#error_info').text(response.errorMessage);
+        }
+        else {
+            $.each(response.errorMessage, function (key, value) {
+                $('#error_info').text(response.errorMessage);
+            });
+        }
         return;
     }
     else{
@@ -543,14 +644,20 @@ RETURNS
 */
 function ret_Get_DB_cal_res_view(response_in) {
     if(DEBUG_EN) console.log('>ret_Get_DB_cal_res_view');
-    response3 = JSON.parse(response_in);
+    if(CODE_RUN_PY == true){ response3 = response_in; }
+    else{ response3 = JSON.parse(response_in); }
     if(DEBUG_EN) console.log(response3);
 
     // return error
     if(response3.success == false){
-        $.each(response3.errorMessage, function (key, value) {
-            $('#error_info').text(value.message);
-        });
+        if(CODE_RUN_PY == true){
+            $('#error_info').text(response.errorMessage);
+        }
+        else {
+            $.each(response.errorMessage, function (key, value) {
+                $('#error_info').text(response.errorMessage);
+            });
+        }
         return;
     }
     else{
@@ -566,8 +673,47 @@ function ret_Get_DB_cal_res_view(response_in) {
          if(DEBUG_EN) console.log(i);
     };
     */
-    doAjax("Get_DB_cal_res_sch", ret_Get_DB_cal_res_sch, today_time(fromtime.current_year_start), today_time(fromtime.current_year_end));
+    if(CODE_RUN_PY == true){
+        doAjax_py("Get_DB_cal_res_sch", ret_Get_DB_cal_res_sch, today_time(fromtime.current_year_start), today_time(fromtime.current_year_end));
+    }
+    else{
+        doAjax("Get_DB_cal_res_sch", ret_Get_DB_cal_res_sch, today_time(fromtime.current_year_start), today_time(fromtime.current_year_end));
+    }
 }
+
+
+/*************************************************************************
+NAME
+DESCRIPTION
+RETURNS
+*/
+/* function ret_py_Get_DB_cal_res(response_in) {
+    if(DEBUG_EN) console.log('>ret_py_Get_DB_cal_res');
+    response = response_in;
+    if(DEBUG_EN) console.log(response);
+} */
+
+/*************************************************************************
+NAME
+DESCRIPTION
+RETURNS
+*/
+/* function ret_py_Get_DB_cal_res_sch(response_in) {
+    if(DEBUG_EN) console.log('>ret_py_Get_DB_cal_res_sch');
+    response2 = response_in;
+    if(DEBUG_EN) console.log(response2);
+} */
+
+/*************************************************************************
+NAME
+DESCRIPTION
+RETURNS
+*/
+/* function ret_py_Get_DB_cal_res_view(response_in) {
+    if(DEBUG_EN) console.log('>ret_py_Get_DB_cal_res_view');
+    response3 = response_in;
+    if(DEBUG_EN) console.log(response3);
+} */
 
 /*************************************************************************
 NAME
@@ -630,7 +776,8 @@ $(function () {
         // init resource load ----------------------------
         // ui_init
         text_init();
-        //doAjax("Get_DB_cal_res", ret_Get_DB_cal_res);
+        if(CODE_RUN_PY == true){ doAjax_py("Get_DB_cal_res", ret_Get_DB_cal_res); }
+        else{ doAjax("Get_DB_cal_res", ret_Get_DB_cal_res); }
 
         // time display
         setInterval(function(){
@@ -643,7 +790,8 @@ $(function () {
 
         setInterval(function(){
             // get meeting room list of database
-            //doAjax("Get_DB_cal_res", ret_Get_DB_cal_res);
+            if(CODE_RUN_PY == true){ doAjax_py("Get_DB_cal_res", ret_Get_DB_cal_res); }
+            else{ doAjax("Get_DB_cal_res", ret_Get_DB_cal_res); }
         },1000*(60*1)/*30초*/);
 
         // alarm setting
@@ -721,59 +869,10 @@ $(function () {
         });
 
         $('#alertXX').bind('click', function () {
-
+            //if(CODE_RUN_PY == true){ doAjax_py("Get_DB_cal_res", ret_Get_DB_cal_res); }
+            //else{ doAjax("Get_DB_cal_res", ret_Get_DB_cal_res); }
             //alert('Im going to start processing');
-            $.ajax({
-                type: 'GET',
-                url: "http://127.0.0.1:5000/get_db_cal_res",
-                dataType: "json",
-                crossDomain: true,
-                success: function (response) {
-                    output = response;
-                    alert(output);
-                }
-            }).done(function (data) {
-                console.log(data);
-            });
-/*             $.ajax({
-                url: "http://localhost/vscode-git/kiosk/py/test.py",
-                type: "POST",
-                cache:false,
-                datatype:"json",
-                data: {param: '123'},
-                success: function(msg){
-                    console.log(msg)
-                    alert(msg.message);
-                    alert(msg.keys);
-                },
-                error: function(msg){
-                    alert('msg')
-                }
-            }); */
-
-/*             var user = 'seyoung';
-            var pass = 'seyoung_pwd';
-            $.ajax({
-                url: "http://127.0.0.1:5000/test",
-                data: JSON.stringify({username: user, password: pass}),
-                type: 'POST',
-                headers: {'Content-Type':'application/json'},
-                success: function(response){
-                    console.log(response);
-                },
-                error: function(error){
-                    console.log(error);
-                }
-            }); */
-
-            //$SCRIPT_ROOT = request.script_root|tojson|safe;
-/*             $.getJSON('/_add_numbers', {
-                a: $('input[name="a"]').val(),
-                b: $('input[name="b"]').val()
-              }, function(data) {
-                console.log(data.result);
-              }); */
-
+            //doAjax_py("Get_DB_cal_res", ret_Get_DB_cal_res);
             /* table.page(1).draw('page'); */
             /* table.page('next').draw('page');
             table.page('previous').draw('page'); */
