@@ -14,6 +14,7 @@ while true; do
 
 # kill the background python app
 killall -9 python
+killall -9 chromium-browse
 
 # excute the background python app
 python /var/www/html/kiosk/py/GetDatabases.py &
@@ -29,7 +30,7 @@ echo "1"
 sleep 1
 
 #--virtual-keyboard
-DISPLAY=:0 chromium-browser --disable-translate --noerrdialogs --kiosk --touch-events=enabled --disable-pinch --noerrdialogs --disable-session-crashed-bubble --app=http://127.0.0.1/kiosk/index.html --incognito
+DISPLAY=:0 chromium-browser --disable-translate --noerrdialogs --kiosk --touch-events=enabled --disable-pinch --noerrdialogs --disable-session-crashed-bubble --app=http://127.0.0.1/kiosk/index.html --incognito &
 
 done
 
