@@ -781,7 +781,13 @@ RETURNS
 function findFlagInfo(str)
 {
     if(DEBUG_EN) console.log(">findFlagInfo >> "+str);
-    var f = "http://localhost/vscode-git/kiosk/file/info.txt";
+    var f = '';
+    if(CODE_RUN_WINDOWS == true){
+        f = "http://localhost/vscode-git/kiosk/file/info.txt";
+    }
+    else{
+        f = "http://localhost/kiosk/file/info.txt";
+    }
     ReadTextFile(f, str);
 }
 
