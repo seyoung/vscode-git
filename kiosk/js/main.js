@@ -722,7 +722,7 @@ RETURNS
 */
 function MakeMeetingRoomTable(data_array){
     return $('#wgc_table').DataTable( {
-       "scrollY": "415px",
+       "scrollY": "416px",
        "scrollX": false,
        "autoWidth": true,/*true,*/
        "fixedHeader": {
