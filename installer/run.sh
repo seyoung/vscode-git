@@ -7,6 +7,11 @@ xset s off
 xset -dpms
 xset s 0 0
 
+#matchbox-window-manager &
+#matchbox-keyboard &
+
+while true; do
+
 # kill the background python app
 killall -9 python
 
@@ -23,14 +28,10 @@ sleep 1
 echo "1"
 sleep 1
 
-#matchbox-window-manager &
-#matchbox-keyboard &
-
-#while true; do
 #--virtual-keyboard
 DISPLAY=:0 chromium-browser --disable-translate --noerrdialogs --kiosk --touch-events=enabled --disable-pinch --noerrdialogs --disable-session-crashed-bubble --app=http://127.0.0.1/kiosk/index.html --incognito
 
-#done
+done
 
 #while true; do
 #	#sudo matchbox-window-manager -use_cursor no -use_titlebar no &
