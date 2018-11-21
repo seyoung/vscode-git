@@ -11,7 +11,7 @@
  */
 
  // true: console.log enable, false: console.log disable
-var DEBUG_EN = true;
+var DEBUG_EN = false;
 
 // true: python, false: php
 var CODE_RUN_PY = true;
@@ -811,7 +811,7 @@ function ReadTextFile(afilename, str)
         $.each(info_array, function(i, config) {
             if(info_array[i][0] == str)
                 fixed_id = info_array[i][1];
-                console.log('\r\n fixed_id:'+fixed_id+'\r\n');
+                if(DEBUG_EN) console.log('\r\n fixed_id:'+fixed_id+'\r\n');
         })
     }, 500);
     return;
@@ -864,7 +864,7 @@ $(function () {
                 // get meeting room list of database
                 if(CODE_RUN_PY == true){ doAjax_py("Get_DB_cal_res", ret_Get_DB_cal_res); }
                 else{ doAjax("Get_DB_cal_res", ret_Get_DB_cal_res); }
-            },1000*(60*1)/*30초*/);
+            },1000*(60*1)/*60초*/);
         }, 1000);
 
         // time display
