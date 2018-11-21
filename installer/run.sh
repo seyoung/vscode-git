@@ -1,11 +1,27 @@
 #run setup
-sleep 10
+sleep 5
 unclutter -idle 0 &
 
 export DISPLAY=:0
 xset s off
 xset -dpms
 xset s 0 0
+
+# kill the background python app
+killall -9 python
+
+# excute the background python app
+python /var/www/html/kiosk/py/GetDatabases.py &
+echo "5"
+sleep 1
+echo "4"
+sleep 1
+echo "3"
+sleep 1
+echo "2"
+sleep 1
+echo "1"
+sleep 1
 
 #matchbox-window-manager &
 #matchbox-keyboard &
