@@ -6,13 +6,17 @@ sudo apt-get update
 sudo apt-get upgrade
 
 #LIST="xinit x11-xserver-utils nginx php5-fpm php-apc unclutter gnome-schedule ttf-unfonts-core ibus ibus-hangul"
-LIST1="xscreensaver xinit x11-xserver-utils nginx php-fpm php-apcu unclutter gnome-schedule fonts-unfonts-core ibus ibus-hangul samba samba-common-bin"
+LIST1="xscreensaver xinit x11-xserver-utils nginx php-fpm php-apcu unclutter gnome-schedule fonts-unfonts-core ibus ibus-hangul samba samba-common-bin git-core vim openssh-server ssh"
 sudo apt-get install $LIST1 -y
 
+# ssh server restart
+sudo /etc/init.d/ssh restart
+
 # for touch screen calc because rotate screen
-LIST2="libx11-dev libxext-dev libxi-dev x11proto-input-dev"
+LIST2="libx11-dev libxext-dev libxi-dev x11proto-input-dev xinput_calibrator"
 sudo apt-get install $LIST2 -y
 
+# for python package
 LIST3="app flask flash_cors json pyodbc"
 sudo pip install $LIST3
 
