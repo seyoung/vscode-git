@@ -421,7 +421,7 @@ function text_display() {
                     }
                     // insert data
                     text_array[text_cnt] = new Array(4);
-                    text_array[text_cnt][0] = sdate + ' ~ ' + edate;
+                    text_array[text_cnt][0] = sdate + '  ' + edate;
                     text_array[text_cnt][1] = actor;
                     text_array[text_cnt][2] = body;
                     text_array[text_cnt][3] = status;
@@ -722,17 +722,17 @@ RETURNS
 */
 function MakeMeetingRoomTable(data_array){
     return $('#wgc_table').DataTable( {
-       "scrollY": "420px",
+       "scrollY": "415px",
        "scrollX": false,
-       "autoWidth": true,
+       "autoWidth": true,/*true,*/
        "fixedHeader": {
            "header": false,
            "footer": false
        },
         "columnDefs": [
-            { "width": "100px", "targets": 0 },  // 예약 시간
-            { "width": "100px", "targets": 1 },  // 주관자
-            { "width": "220px", "targets": 2 }, // 회의 제목
+            { "width": "150px", "targets": 0 },  // 예약 시간
+            { "width": "250px", "targets": 1 },  // 주관자
+            { "width": "524px", "targets": 2 }, // 회의 제목
             { "width": "100px", "targets": 3 },  // 진행 상황
         ],
         "language": {

@@ -7,7 +7,7 @@
         {
             "type": "chrome",
             "request": "launch",
-            "port": 5600,
+            "port": 5700,
             "name": "Launch Chrome against localhost",
             "url": "http://localhost/vscode-git/kiosk",
             "webRoot": "${workspaceFolder}/index.html",

@@ -3,12 +3,12 @@
  */
 /*181113.sypark*/
 th {
-  font-size: 22px;
+  font-size: 15px;/*22px;*/
   font-weight: bold;
 
 }
 td {
-  font-size: 18px;
+  font-size: 15px;/*18px;*/
   font-weight: bold;
   text-align: center;
 }

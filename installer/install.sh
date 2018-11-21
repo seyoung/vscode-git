@@ -9,8 +9,12 @@ sudo apt-get upgrade
 LIST1="xscreensaver xinit x11-xserver-utils nginx php-fpm php-apcu unclutter gnome-schedule fonts-unfonts-core ibus ibus-hangul samba samba-common-bin"
 sudo apt-get install $LIST1 -y
 
-LIST2="app flask flash_cors json pyodbc"
-sudo pip install $LIST2
+# for touch screen calc because rotate screen
+LIST2="libx11-dev libxext-dev libxi-dev x11proto-input-dev"
+sudo apt-get install $LIST2 -y
+
+LIST3="app flask flash_cors json pyodbc"
+sudo pip install $LIST3
 
 echo "finish install package"
 
