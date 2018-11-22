@@ -786,7 +786,7 @@ function findFlagInfo(str)
         f = "http://localhost/vscode-git/kiosk/file/info.txt";
     }
     else{
-        f = "http://localhost/kiosk/file/info.txt";
+        f = "http://127.0.0.1/kiosk/file/info.txt";
     }
     ReadTextFile(f, str);
 }
