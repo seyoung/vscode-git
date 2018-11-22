@@ -30,6 +30,7 @@ DISPLAY=:0 chromium-browser --disable-translate --noerrdialogs --kiosk --touch-e
 # kill the background python app
 killall -9 python
 killall -9 chromium-browse
+killall -9 unclutter
 #done
 
 #while true; do
@@ -38,7 +39,6 @@ killall -9 chromium-browse
 
 #florence --daemon &
 #matchbox-keyboard --daemon &
-
 #DISPLAY=:0 chromium-browser --disable-translate --noerrdialogs --kiosk --app=http://127.0.0.1/home.html --incognito &
 #DISPLAY=:0 chromium-browser --disable-translate --noerrdialogs --kiosk --app=http://127.0.0.1/home.html --incognito
 #DISPLAY=:0 chromium-browser --disable-translate --noerrdialogs --kiosk --app=http://gw.idreamtech.co.kr/GWMain/Frame.aspx --incognito
