@@ -5,7 +5,12 @@ unclutter -idle 0 &
 export DISPLAY=:0
 xset s off
 xset -dpms
-xset s 0 0
+#xset s 0 0
+xset s noblank
+
+# ssh & samba server restart
+sudo /etc/init.d/ssh restart
+sudo /etc/init.d/smbd restart
 
 #matchbox-window-manager &
 #matchbox-keyboard &
