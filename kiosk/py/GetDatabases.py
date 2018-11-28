@@ -37,7 +37,7 @@ port = '1433'
     RETURNS
 """
 def Disconnect_Databases(con):
-    print('Disconnect_Databases')
+    #print('Disconnect_Databases')
     con.close()
     return
 
@@ -48,7 +48,7 @@ def Disconnect_Databases(con):
 """
 @app.route('/Get_DB_cal_res', methods = ['POST', 'GET'])
 def Get_DB_cal_res():
-    print('Get_DB_cal_res')
+    #print('Get_DB_cal_res')
 
     ##### create dictionary #####
     objects_list = {'data':{}, 'errorMessage':None, 'success':True}
@@ -102,7 +102,7 @@ def Get_DB_cal_res():
 """
 @app.route('/Get_DB_cal_res_sch', methods = ['POST', 'GET'])
 def Get_DB_cal_res_sch():
-    print('Get_DB_cal_res_sch')
+    #print('Get_DB_cal_res_sch')
 
     ##### create dictionary #####
     objects_list = {'data':{}, 'errorMessage':None, 'success':True}
@@ -128,8 +128,8 @@ def Get_DB_cal_res_sch():
     if (objects_list['success'] == True):
         cursor = conn.cursor()
 
-        print(request.form['sdate'])
-        print(request.form['edate'])
+        #print(request.form['sdate'])
+        #print(request.form['edate'])
 
         '''
         d['sdate'] = request.form['sdate']
@@ -139,7 +139,7 @@ def Get_DB_cal_res_sch():
         # sql_text = 'select * from dbo.cal_res'
         sql_text = 'select * from dbo.cal_res_sch where sdate between '+'\''+request.form['sdate'].replace("\"", "")+'\''+' and '+'\''+request.form['edate'].replace("\"", "")+'\''+' order by sdate asc'
 
-        print(sql_text)
+        #print(sql_text)
 
         cursor.execute(sql_text)
         result = cursor.fetchall()
@@ -175,7 +175,7 @@ def Get_DB_cal_res_sch():
 """
 @app.route('/Get_DB_cal_res_view', methods = ['POST', 'GET'])
 def Get_DB_cal_res_view():
-    print('Get_DB_cal_res_view')
+    #print('Get_DB_cal_res_view')
 
     ##### create dictionary #####
     objects_list = {'data':{}, 'errorMessage':None, 'success':True}
@@ -200,8 +200,8 @@ def Get_DB_cal_res_view():
     if (objects_list['success'] == True):
         cursor = conn.cursor()
 
-        print(request.form['sdate'])
-        print(request.form['edate'])
+        #print(request.form['sdate'])
+        #print(request.form['edate'])
 
         '''
         d['sdate'] = request.form['sdate']
@@ -213,7 +213,7 @@ def Get_DB_cal_res_view():
 
         sql_text = 'select * from dbo.cal_res_view where view_start_date between '+'\''+request.form['sdate'].replace("\"", "")+'\''+' and '+'\''+request.form['edate'].replace("\"", "")+'\''+' order by view_start_date asc'
 
-        print(sql_text)
+        #print(sql_text)
 
         cursor.execute(sql_text)
         result = cursor.fetchall()

@@ -35,12 +35,13 @@ var fromtime = {
     current_year_start: 1,
     current_year_end: 2,
     current_day: 3,
-    current_day_time: 4,
-    current_day_time_start: 5,
-    current_day_time_end: 6,
-    current_time: 7,
-    before_aweek_today: 8,
-    after_aweek_today: 9,
+    current_day_week: 4,
+    current_apm_time: 5,
+    current_day_time_start: 6,
+    current_day_time_end: 7,
+    current_time: 8,
+    before_aweek_today: 9,
+    after_aweek_today: 10,
 };
 var table;
 var alertX = null;
@@ -149,12 +150,20 @@ function today_time(type) {
     else if (type == fromtime.current_day) {
         today = yyyy + '-' + mm + '-' + dd;
     }
-    // 2018-11-01(화) 오후 1:54:49
-    else if (type == fromtime.current_day_time) {
+    // 2018-11-01(화)
+    else if (type == fromtime.current_day_week) {
         if (h >= 12 && h <= 24) {
-            today = yyyy + '-' + mm + '-' + dd + '('+get_dayoftheweek()+')' + ' 오후 ' + (h - 12) + ':' + m + ':' + s;
+            today = yyyy + '-' + mm + '-' + dd + '('+get_dayoftheweek()+')';
         } else {
-            today = yyyy + '-' + mm + '-' + dd + '('+get_dayoftheweek()+')' + ' 오전 ' + h + ':' + m + ':' + s;
+            today = yyyy + '-' + mm + '-' + dd + '('+get_dayoftheweek()+')';
+        }
+    }
+    // 오후 1:54
+    else if(type == fromtime.current_apm_time){
+        if (h >= 12 && h <= 24) {
+            today = '오후 ' + (h - 12) + ':' + m;// + ':' + s;
+        } else {
+            today = '오전 ' + h + ':' + m;// + ':' + s;
         }
     }
     // 2018-10-31 00:30:00.000
@@ -182,7 +191,7 @@ DESCRIPTION
 RETURNS
 */
 function doAjax(method, func, sdate, edate, res_seq, schedule_seq) {
-    if(DEBUG_EN) console.log('>doAjax: ' + method);
+    if(DEBUG_EN) console.log('> doAjax: ' + method);
 
     var server, username, password, portnumber, dbname;
     var jsdate, jedate, jres_seq, jschedule_seq;
@@ -217,7 +226,7 @@ DESCRIPTION
 RETURNS
 */
 function theAjax(method, url, server, username, password, portnum, dbname, sdate, edate, res_seq, schedule_seq) {
-    if(DEBUG_EN) console.log('>theAjax');
+    if(DEBUG_EN) console.log('> theAjax');
     return $.ajax({
         type: 'POST',
         url: url,
@@ -243,7 +252,7 @@ DESCRIPTION
 RETURNS
 */
 function doAjax_py(method=null, func=null, sdate=null, edate=null, res_seq=null, schedule_seq=null) {
-    if(DEBUG_EN) console.log('>doAjax_py: ' + method);
+    if(DEBUG_EN) console.log('> doAjax_py: ' + method);
 
     var server, username, password, portnumber, dbname;
     var jsdate, jedate, jres_seq, jschedule_seq;
@@ -278,7 +287,7 @@ DESCRIPTION
 RETURNS
 */
 function theAjax_py(/*method, */url, server, username, password, portnum, dbname, sdate, edate, res_seq, schedule_seq) {
-    if(DEBUG_EN) console.log('>theAjax_py');
+    if(DEBUG_EN) console.log('> theAjax_py');
     return $.ajax({
         type: 'POST',//'POST' 'GET',
         url: url,
@@ -308,8 +317,7 @@ RETURNS
 */
 function changeLang_1_Select() {
     if(!getlistDB) return;
-
-    //if(DEBUG_EN) console.log(">database changeLang_1_Select");
+    //if(DEBUG_EN) console.log("> database changeLang_1_Select");
     $("#databases1 option").remove();
     text_clear();
 
@@ -339,8 +347,7 @@ RETURNS
 */
 function changeLang_2_Select() {
     if(!getlistDB) return;
-
-    //if(DEBUG_EN) console.log(">database1 changeLang_2_Select");
+    //if(DEBUG_EN) console.log("> database1 changeLang_2_Select");
     text_clear();
 
     if(response){
@@ -507,7 +514,7 @@ DESCRIPTION
 RETURNS
 */
 function ret_Get_DB_cal_res(response_in) {
-    if(DEBUG_EN) console.log('>ret_Get_DB_cal_res');
+    if(DEBUG_EN) console.log('> ret_Get_DB_cal_res');
     if(CODE_RUN_PY == true){ response = response_in; }
     else{ response = JSON.parse(response_in); }
     if(DEBUG_EN) console.log(response);
@@ -609,7 +616,7 @@ DESCRIPTION
 RETURNS
 */
 function ret_Get_DB_cal_res_sch(response_in) {
-    if(DEBUG_EN) console.log('>ret_Get_DB_cal_res_sch');
+    if(DEBUG_EN) console.log('> ret_Get_DB_cal_res_sch');
     if(CODE_RUN_PY == true){ response2 = response_in; }
     else{ response2 = JSON.parse(response_in); }
     if(DEBUG_EN) console.log(response2);
@@ -651,7 +658,7 @@ DESCRIPTION
 RETURNS
 */
 function ret_Get_DB_cal_res_view(response_in) {
-    if(DEBUG_EN) console.log('>ret_Get_DB_cal_res_view');
+    if(DEBUG_EN) console.log('> ret_Get_DB_cal_res_view');
     if(CODE_RUN_PY == true){ response3 = response_in; }
     else{ response3 = JSON.parse(response_in); }
     if(DEBUG_EN) console.log(response3);
@@ -696,7 +703,7 @@ DESCRIPTION
 RETURNS
 */
 /* function ret_py_Get_DB_cal_res(response_in) {
-    if(DEBUG_EN) console.log('>ret_py_Get_DB_cal_res');
+    if(DEBUG_EN) console.log('> ret_py_Get_DB_cal_res');
     response = response_in;
     if(DEBUG_EN) console.log(response);
 } */
@@ -707,7 +714,7 @@ DESCRIPTION
 RETURNS
 */
 /* function ret_py_Get_DB_cal_res_sch(response_in) {
-    if(DEBUG_EN) console.log('>ret_py_Get_DB_cal_res_sch');
+    if(DEBUG_EN) console.log('> ret_py_Get_DB_cal_res_sch');
     response2 = response_in;
     if(DEBUG_EN) console.log(response2);
 } */
@@ -718,7 +725,7 @@ DESCRIPTION
 RETURNS
 */
 /* function ret_py_Get_DB_cal_res_view(response_in) {
-    if(DEBUG_EN) console.log('>ret_py_Get_DB_cal_res_view');
+    if(DEBUG_EN) console.log('> ret_py_Get_DB_cal_res_view');
     response3 = response_in;
     if(DEBUG_EN) console.log(response3);
 } */
@@ -780,7 +787,7 @@ RETURNS
 */
 function findFlagInfo(str)
 {
-    if(DEBUG_EN) console.log(">findFlagInfo >> "+str);
+    if(DEBUG_EN) console.log("> findFlagInfo");
     var f = '';
     if(CODE_RUN_WINDOWS == true){
         f = "http://localhost/vscode-git/kiosk/file/info.txt";
@@ -853,14 +860,20 @@ RETURNS
 */
 $(function () {
     $(document).ready(function () {
-        if(DEBUG_EN) console.log('ready');
-        // init resource load ----------------------------
-        // ui_init
+        if(DEBUG_EN) console.log('> ready');
+
+        /*
+        * init resource load
+        */
         text_init();
         findFlagInfo('resource_id');
 
+        document.getElementById('day_sch').innerHTML = today_time(fromtime.current_day_week);
+        document.getElementById('clock').innerHTML = today_time(fromtime.current_apm_time);
+
         // Init start DB List
         setTimeout(function() {
+            if(DEBUG_EN) console.log('> clock refresh');
             if(CODE_RUN_PY == true){ doAjax_py("Get_DB_cal_res", ret_Get_DB_cal_res); }
             else{ doAjax("Get_DB_cal_res", ret_Get_DB_cal_res); }
 
@@ -875,74 +888,56 @@ $(function () {
 
         // time display
         setInterval(function(){
-            var timer = new Date();
-            var h = timer.getHours();
-            var m = timer.getMinutes();
-            var s = timer.getSeconds();
-            document.getElementById('clock').innerHTML = today_time(fromtime.current_day_time);
-        },1000);
+            document.getElementById('day_sch').innerHTML = today_time(fromtime.current_day_week);
+            document.getElementById('clock').innerHTML = today_time(fromtime.current_apm_time);
+        },1000*(60*1)/*60초*/);
         // alarm setting
         alertX = $.dialog.alert;
-    });
-    /*
-     * Tabs
-     */
-    $('#work').each(function () {
-        // 탭의 각 요소를 jQuery 객체 화
-        var $tabList = $(this).find('.tabs-nav'), // 탭의 목록
-            $tabAnchors = $tabList.find('a'), // 탭 (링크)
-            $tabPanels = $(this).find('.tabs-panel'); // 패널
 
-        // 탭이 클릭되었을 때의 처리
-        // 인자로 이벤트 객체를 받는다.
-        $tabList.on('click', 'a', function (event) {
-
-            // 링크 클릭에 대한 기본 동작을 취소
-            event.preventDefault();
-
-            // 클릭 된 탭을 jQuery 오브젝트화
-            var $this = $(this);
-
-            // 만약 이미 선택된 탭이라면 아무것도하지 않고 처리를 중지
-            if ($this.hasClass('active')) {
-                return;
-            }
-
-            // 모든 탭의 선택 상태를 해제 한,
-            // 클릭 된 탭을 선택 상태로
-            $tabAnchors.removeClass('active');
-            $this.addClass('active');
-
-            // 모든 패널을 일단 비 표시로하고
-            // 클릭 된 탭에 대응하는 패널을 표시
-            $tabPanels.hide();
-            $($this.attr('href')).show();
-
-        });
-        // 첫 번째 탭을 선택 상태로
-        $tabAnchors.eq(0).trigger('click');
-    });
-    /**
-    When the DOM is ready, we use the data table API to create a new one
-    based on a javascript array that provides the data.
-    */
-    $(document).ready(function() {
-        table = MakeMeetingRoomTable(dataSet);
         /*
-        $('.marquee').marquee({
-            //speed in milliseconds of the marquee
-            loop: -1,
-            duration: 10000,
-            //gap in pixels between the tickers
-            gap: 10,
-            //time in milliseconds before the marquee will start animating
-            delayBeforeStart: 0,
-            //'left' or 'right'
-            direction: 'left',
-            //true or false - should the marquee be duplicated to show an effect of continues flow
-            duplicated: true
-        });
+        * Tabs
         */
+        $('#work').each(function () {
+            // 탭의 각 요소를 jQuery 객체 화
+            var $tabList = $(this).find('.tabs-nav'), // 탭의 목록
+                $tabAnchors = $tabList.find('a'), // 탭 (링크)
+                $tabPanels = $(this).find('.tabs-panel'); // 패널
+
+            // 탭이 클릭되었을 때의 처리
+            // 인자로 이벤트 객체를 받는다.
+            $tabList.on('click', 'a', function (event) {
+
+                // 링크 클릭에 대한 기본 동작을 취소
+                event.preventDefault();
+
+                // 클릭 된 탭을 jQuery 오브젝트화
+                var $this = $(this);
+
+                // 만약 이미 선택된 탭이라면 아무것도하지 않고 처리를 중지
+                if ($this.hasClass('active')) {
+                    return;
+                }
+
+                // 모든 탭의 선택 상태를 해제 한,
+                // 클릭 된 탭을 선택 상태로
+                $tabAnchors.removeClass('active');
+                $this.addClass('active');
+
+                // 모든 패널을 일단 비 표시로하고
+                // 클릭 된 탭에 대응하는 패널을 표시
+                $tabPanels.hide();
+                $($this.attr('href')).show();
+
+            });
+            // 첫 번째 탭을 선택 상태로
+            $tabAnchors.eq(0).trigger('click');
+        });
+
+        /*
+        * When the DOM is ready, we use the data table API to create a new one
+        * based on a javascript array that provides the data.
+        */
+        table = MakeMeetingRoomTable(dataSet);
         $('.marquee')
         .bind('beforeStarting', function () {
             //code you want to execute before starting the animations
@@ -955,6 +950,9 @@ $(function () {
             duration: 10000
         });
 
+        /*
+        * button
+        */
         $('#alertXX').bind('click', function () {
             //if(CODE_RUN_PY == true){ doAjax_py("Get_DB_cal_res", ret_Get_DB_cal_res); }
             //else{ doAjax("Get_DB_cal_res", ret_Get_DB_cal_res); }
@@ -966,6 +964,12 @@ $(function () {
             /*alertX("회의실 시작 10분전", "08:30 ~ 15:30 <br> 품질보증팀 조우규 주임 <br> 품질보증팀 계측기 관리방안 회의", function () {
                 //$.dialog.alert("Alert", "Closed");
             });*/
+        });
+        $('#left_day').bind('click', function () {
+            if(DEBUG_EN) console.log('< click');
+        });
+        $('#right_day').bind('click', function () {
+            if(DEBUG_EN) console.log('> click');
         });
     });
 });
