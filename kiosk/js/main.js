@@ -1035,5 +1035,10 @@ $(function () {
             document.getElementById('point_sch').innerHTML = point_today;
             text_display();
         });
+        $('#today').bind('click', function () {
+            // reinit day offset
+            initdayOffset();
+            text_display();
+        });
     });
 });
