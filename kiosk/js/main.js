@@ -73,14 +73,14 @@ NAME
 DESCRIPTION
 RETURNS
 */
-function get_a_week_afterbefore_from_today(type){
+function get_a_week_afterbefore_from_today(type, week_cnt = 1){
     var date = new Date();
     var result;
     if (type == fromtime.before_aweek_today) {
-        date.setDate(date.getDate() - 7);
+        date.setDate(date.getDate() - (7*week_cnt));
     }
     else if(type == fromtime.after_aweek_today){
-        date.setDate(date.getDate() + 7);
+        date.setDate(date.getDate() + (7*week_cnt));
     }
     var dd = date.getDate();
     var mm = date.getMonth() + 1;
@@ -553,6 +553,7 @@ function ret_Get_DB_cal_res(response_in) {
 
     // return error
     if(response.success == false){
+        if(DEBUG_EN) console.log('> error sql connect');
         if(CODE_RUN_PY == true){
             $('#error_info').text(response.errorMessage);
         }
@@ -632,12 +633,12 @@ function ret_Get_DB_cal_res(response_in) {
 
     // get meeting room schedule list of database
     if(CODE_RUN_PY == true){
-        doAjax_py("Get_DB_cal_res_view", ret_Get_DB_cal_res_view, get_a_week_afterbefore_from_today(fromtime.before_aweek_today), get_a_week_afterbefore_from_today(fromtime.after_aweek_today));
+        doAjax_py("Get_DB_cal_res_view", ret_Get_DB_cal_res_view, get_a_week_afterbefore_from_today(fromtime.before_aweek_today, 4/*4 Weeks*/), get_a_week_afterbefore_from_today(fromtime.after_aweek_today, 4/*4 Weeks*/));
     }
     else{
         //doAjax("Get_DB_cal_res_view", ret_Get_DB_cal_res_view, today_time(fromtime.current_day_time_start), today_time(fromtime.current_day_time_end));
         //doAjax("Get_DB_cal_res_view", ret_Get_DB_cal_res_view, '2018-11-06 00:30:00.000', '2018-11-20 23:30:00.000');
-        doAjax("Get_DB_cal_res_view", ret_Get_DB_cal_res_view, get_a_week_afterbefore_from_today(fromtime.before_aweek_today), get_a_week_afterbefore_from_today(fromtime.after_aweek_today));
+        doAjax("Get_DB_cal_res_view", ret_Get_DB_cal_res_view, get_a_week_afterbefore_from_today(fromtime.before_aweek_today, 4/*4 Weeks*/), get_a_week_afterbefore_from_today(fromtime.after_aweek_today, 4/*4 Weeks*/));
     }
     getlistDB = true;
 }
@@ -655,6 +656,7 @@ function ret_Get_DB_cal_res_sch(response_in) {
 
     // return error
     if(response2.success == false){
+        if(DEBUG_EN) console.log('> error sql connect');
         if(CODE_RUN_PY == true){
             $('#error_info').text(response.errorMessage);
         }
@@ -697,6 +699,7 @@ function ret_Get_DB_cal_res_view(response_in) {
 
     // return error
     if(response3.success == false){
+        if(DEBUG_EN) console.log('> error sql connect');
         if(CODE_RUN_PY == true){
             $('#error_info').text(response.errorMessage);
         }
