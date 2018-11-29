@@ -49,6 +49,7 @@ var fromtime = {
 var table;
 var alertX = null;
 var getlistDB = false;
+var refresh_timer;
 
 /**
 The data that will be show by the data table
@@ -352,6 +353,8 @@ function changeLang_1_Select() {
         }
         text_display();
     }
+    //refresh DB timer
+    initDBTimer(60);
 }
 
 /*************************************************************************
@@ -374,6 +377,8 @@ function changeLang_2_Select() {
         }
         text_display();
     }
+    //refresh DB timer
+    initDBTimer(60);
 }
 
 /*************************************************************************
@@ -915,6 +920,27 @@ NAME
 DESCRIPTION
 RETURNS
 */
+function initDBTimer(refresh_time)
+{
+    //if(DEBUG_EN) console.log("> initDBTimer refresh_time: "+refresh_time);
+    // Restart DB List
+    if(refresh_timer) clearInterval(refresh_timer);
+    refresh_timer = setInterval(function(){
+        // reinit day offset
+        initdayOffset();
+        // find my room number
+        findFlagInfo('resource_id');
+        // get meeting room list of database
+        if(CODE_RUN_PY == true){ doAjax_py("Get_DB_cal_res", ret_Get_DB_cal_res); }
+        else{ doAjax("Get_DB_cal_res", ret_Get_DB_cal_res); }
+    },1000*(refresh_time*1));
+}
+
+/*************************************************************************
+NAME
+DESCRIPTION
+RETURNS
+*/
 $(function () {
     $(document).ready(function () {
         if(DEBUG_EN) console.log('> ready');
@@ -929,24 +955,12 @@ $(function () {
         initdayOffset();
         // init day clock
         initdayClock();
-        // Init start DB List
         setTimeout(function() {
-            if(DEBUG_EN) console.log('> clock refresh');
             if(CODE_RUN_PY == true){ doAjax_py("Get_DB_cal_res", ret_Get_DB_cal_res); }
             else{ doAjax("Get_DB_cal_res", ret_Get_DB_cal_res); }
-
-            // Restart DB List
-            setInterval(function(){
-                // reinit day offset
-                initdayOffset();
-                // find my room number
-                findFlagInfo('resource_id');
-                // get meeting room list of database
-                if(CODE_RUN_PY == true){ doAjax_py("Get_DB_cal_res", ret_Get_DB_cal_res); }
-                else{ doAjax("Get_DB_cal_res", ret_Get_DB_cal_res); }
-            },1000*(60*1)/*60초*/);
+            // Init start DB List
+            initDBTimer(60);
         }, 1000);
-
         // time display
         setInterval(function(){
             // init day clock
@@ -1015,10 +1029,6 @@ $(function () {
         * button
         */
         $('#alertXX').bind('click', function () {
-            //if(CODE_RUN_PY == true){ doAjax_py("Get_DB_cal_res", ret_Get_DB_cal_res); }
-            //else{ doAjax("Get_DB_cal_res", ret_Get_DB_cal_res); }
-            //alert('Im going to start processing');
-            //doAjax_py("Get_DB_cal_res", ret_Get_DB_cal_res);
             /* table.page(1).draw('page'); */
             /* table.page('next').draw('page');
             table.page('previous').draw('page'); */
@@ -1031,17 +1041,23 @@ $(function () {
             point_today = today_time(fromtime.previous_day, day_offset);
             document.getElementById('point_sch').innerHTML = point_today;
             text_display();
+            //refresh DB timer
+            initDBTimer(60);
         });
         $('#right_day').bind('click', function () {
             day_offset = day_offset + 1;
             point_today = today_time(fromtime.next_day, day_offset);
             document.getElementById('point_sch').innerHTML = point_today;
             text_display();
+            //refresh DB timer
+            initDBTimer(60);
         });
         $('#today').bind('click', function () {
             // reinit day offset
             initdayOffset();
             text_display();
+            //refresh DB timer
+            initDBTimer(60);
         });
     });
 });
