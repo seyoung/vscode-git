@@ -28,9 +28,10 @@ var FIXED_ROOM_FROM_TXT = true;
 */
 var response, response2, response3, response4;
 var uniq;
-var resource_id;
-var fixed_id;
-var today;
+var resource_id = 0;
+var fixed_id = 0;
+var day_offset = 0;
+var point_today;
 var fromtime = {
     current_year_start: 1,
     current_year_end: 2,
@@ -42,6 +43,8 @@ var fromtime = {
     current_time: 8,
     before_aweek_today: 9,
     after_aweek_today: 10,
+    previous_day: 11,
+    next_day: 12,
 };
 var table;
 var alertX = null;
@@ -116,8 +119,10 @@ NAME
 DESCRIPTION
 RETURNS
 */
-function today_time(type) {
-    today = new Date();
+function today_time(type, day = 0) {
+    var today = new Date();
+    //if(DEBUG_EN) console.log("day offset --> " + day)
+    today.setDate(today.getDate() + day);
     var dd = today.getDate();
     var mm = today.getMonth() + 1; //January is 0!
     var yyyy = today.getFullYear();
@@ -181,6 +186,15 @@ function today_time(type) {
         }
         today = h + ':' + m;
     }
+    // 2018-11-01 --
+    else if(type == fromtime.previous_day) {
+        today = yyyy + '-' + mm + '-' + dd;
+    }
+    // 2018-11-01 ++
+    else if(type == fromtime.next_day) {
+        today = yyyy + '-' + mm + '-' + dd;
+    }
+
     //if(DEBUG_EN) console.log('>' + today);
     return today;
 }
@@ -402,34 +416,52 @@ function text_display() {
                     actor = response2.data['database']['actor'][k].replace(/▒/gi, ' ');
                     body = response2.data['database']['body'][k];
 
-                    // 2018-11-01 // 23:30:00
-                    var now = today_time(fromtime.current_day) + ' ' + today_time(fromtime.current_time);
+                    //if(DEBUG_EN) console.log(sdate+'~'+edate+'|'+actor+'|'+body)
 
-                    // schedule start ---- now ---- schedule stop
-                    if(sdate <= now && now < edate){
-                        status = "진행중";
-                    }
-                    // ---- now ------------------- schedule stop
-                    else if(now >= edate){
-                        // only today
-                        if(sdate.substring(0, 10) == today_time(fromtime.current_day))
-                        {
-                            status = "완료";
+                    // 2018-11-01 23:30:00
+                    var now_day = today_time(fromtime.current_day);
+                    //now_day = "2018-11-22";
+                    //now_day = point_today;
+                    var now_daytime = now_day + ' ' + today_time(fromtime.current_time);
+                    // now_daytime = "2018-11-26 12:30:00";
+
+                    if(now_day != point_today){
+                        if(point_today >= now_day){
+                            if(sdate.substring(0, 10) == point_today){
+                                status = "예정";
+                            }
+                            else { continue; }
                         }
                         else{
-                            continue;
+                            if(sdate.substring(0, 10) == point_today){
+                                status = "완료";
+                            }
+                            else { continue; }
                         }
                     }
-                    // ---------------------------- schedule stop ---- now
-                    else if (now < edate){
-                        if(sdate.substring(0, 10) == today_time(fromtime.current_day))
-                        {
-                            status = "예정";
+                    else{
+                        // schedule start ---- now ---- schedule stop
+                        if(sdate <= now_daytime && now_daytime < edate){
+                            status = "진행중";
                         }
-                        else{
-                            continue;
+                        // ---- now ------------------- schedule stop
+                        else if(now_daytime >= edate){
+                            // only today (2018-11-01 == 2018-11-01)
+                            if(sdate.substring(0, 10) == now_day){
+                                status = "완료";
+                            }
+                            else { continue; }
+                        }
+                        // ---------------------------- schedule stop ---- now
+                        else if (now_daytime < edate){
+                            // only today (2018-11-01 == 2018-11-01)
+                            if(sdate.substring(0, 10) == now_day){
+                                status = "예정";
+                            }
+                            else { continue; }
                         }
                     }
+
                     // insert data
                     text_array[text_cnt] = new Array(4);
                     text_array[text_cnt][0] = sdate + '  ' + edate;
@@ -438,7 +470,7 @@ function text_display() {
                     text_array[text_cnt][3] = status;
 
                     // index value is fist of remain schedule
-                    if(now < edate && index == 0){
+                    if(now_daytime < edate && index == 0){
                         index = text_cnt/10;
                         if(index < 1) index = 0;
                         //if(DEBUG_EN) console.log('current position: '+text_cnt+', page number: '+index);
@@ -636,8 +668,8 @@ function ret_Get_DB_cal_res_sch(response_in) {
     else{
         $('#error_info').text('');
     }
-    /*
-    for(var i = 0; i < response2.data['database']['resource_seq'].length; i++)
+
+    /* for(var i = 0; i < response2.data['database']['resource_seq'].length; i++)
     {
         var text_str = '1: '+response2.data['database']['schedule_seq'][i]+','+
                        '2: '+response2.data['database']['resource_seq'][i]+','+
@@ -645,9 +677,9 @@ function ret_Get_DB_cal_res_sch(response_in) {
                        '4: '+response2.data['database']['sdate'][i].date+','+
                        '5: '+response2.data['database']['edate'][i].date+','+
                        '6: '+response2.data['database']['body'][i];
-        if(DEBUG_EN) console.log(i);
-    };
-    */
+        if(DEBUG_EN) console.log(text_str);
+    }; */
+
     text_clear();
     text_display();
 }
@@ -737,7 +769,7 @@ RETURNS
 */
 function MakeMeetingRoomTable(data_array){
     return $('#wgc_table').DataTable( {
-       "scrollY": "412px",
+       "scrollY": "408px",
        "scrollX": false,
        "autoWidth": true,/*true,*/
        "fixedHeader": {
@@ -858,6 +890,28 @@ NAME
 DESCRIPTION
 RETURNS
 */
+function initdayOffset()
+{
+    day_offset = 0;
+    document.getElementById('point_sch').innerHTML = (point_today = today_time(fromtime.current_day));
+}
+
+/*************************************************************************
+NAME
+DESCRIPTION
+RETURNS
+*/
+function initdayClock()
+{
+    document.getElementById('day_sch').innerHTML = "현재 시간: "+today_time(fromtime.current_day_week);
+    document.getElementById('clock').innerHTML = today_time(fromtime.current_apm_time);
+}
+
+/*************************************************************************
+NAME
+DESCRIPTION
+RETURNS
+*/
 $(function () {
     $(document).ready(function () {
         if(DEBUG_EN) console.log('> ready');
@@ -866,11 +920,12 @@ $(function () {
         * init resource load
         */
         text_init();
+        // find my room number
         findFlagInfo('resource_id');
-
-        document.getElementById('day_sch').innerHTML = today_time(fromtime.current_day_week);
-        document.getElementById('clock').innerHTML = today_time(fromtime.current_apm_time);
-
+        // init day offset
+        initdayOffset();
+        // init day clock
+        initdayClock();
         // Init start DB List
         setTimeout(function() {
             if(DEBUG_EN) console.log('> clock refresh');
@@ -879,6 +934,9 @@ $(function () {
 
             // Restart DB List
             setInterval(function(){
+                // reinit day offset
+                initdayOffset();
+                // find my room number
                 findFlagInfo('resource_id');
                 // get meeting room list of database
                 if(CODE_RUN_PY == true){ doAjax_py("Get_DB_cal_res", ret_Get_DB_cal_res); }
@@ -888,8 +946,8 @@ $(function () {
 
         // time display
         setInterval(function(){
-            document.getElementById('day_sch').innerHTML = today_time(fromtime.current_day_week);
-            document.getElementById('clock').innerHTML = today_time(fromtime.current_apm_time);
+            // init day clock
+            initdayClock();
         },1000*(60*1)/*60초*/);
         // alarm setting
         alertX = $.dialog.alert;
@@ -966,10 +1024,16 @@ $(function () {
             });*/
         });
         $('#left_day').bind('click', function () {
-            if(DEBUG_EN) console.log('< click');
+            day_offset = day_offset - 1;
+            point_today = today_time(fromtime.previous_day, day_offset);
+            document.getElementById('point_sch').innerHTML = point_today;
+            text_display();
         });
         $('#right_day').bind('click', function () {
-            if(DEBUG_EN) console.log('> click');
+            day_offset = day_offset + 1;
+            point_today = today_time(fromtime.next_day, day_offset);
+            document.getElementById('point_sch').innerHTML = point_today;
+            text_display();
         });
     });
 });

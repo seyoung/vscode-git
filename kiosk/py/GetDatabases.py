@@ -139,7 +139,7 @@ def Get_DB_cal_res_sch():
         # sql_text = 'select * from dbo.cal_res'
         sql_text = 'select * from dbo.cal_res_sch where sdate between '+'\''+request.form['sdate'].replace("\"", "")+'\''+' and '+'\''+request.form['edate'].replace("\"", "")+'\''+' order by sdate asc'
 
-        #print(sql_text)
+        print(sql_text)
 
         cursor.execute(sql_text)
         result = cursor.fetchall()
@@ -213,7 +213,7 @@ def Get_DB_cal_res_view():
 
         sql_text = 'select * from dbo.cal_res_view where view_start_date between '+'\''+request.form['sdate'].replace("\"", "")+'\''+' and '+'\''+request.form['edate'].replace("\"", "")+'\''+' order by view_start_date asc'
 
-        #print(sql_text)
+        print(sql_text)
 
         cursor.execute(sql_text)
         result = cursor.fetchall()

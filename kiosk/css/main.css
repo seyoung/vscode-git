@@ -158,9 +158,13 @@ img { vertical-align: middle; }
     font-size: 15px;
     font-weight: bold;
     letter-spacing: 2px;
+    padding-right: 10px;
     display: inline;
 }
-
+.work-section .tabs-nav input {
+    /* float: right; */
+    font-weight: bold;
+}
 .work-section .tabs-nav a:hover,
 .work-section .tabs-nav a.active {
     background-color: #696969;
